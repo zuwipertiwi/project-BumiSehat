@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daftar - BumiSehat 🌱</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .hero-gradient {
+      background: linear-gradient(135deg, #064e3b 0%, #059669 25%, #34d399 50%, #6ee7b7 75%, #a7f3d0 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 8s ease infinite;
+    }
+    
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 1rem 1rem 1rem 3rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      outline: none;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.9);
+      font-size: 16px;
+    }
+
+    .input-field:focus {
+      border-color: #10b981;
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+      background: white;
+    }
+
+    .input-field:valid {
+      border-color: #10b981;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6b7280;
+      font-size: 1.25rem;
+      transition: color 0.3s ease;
+    }
+
+    .input-field:focus + .input-icon {
+      color: #10b981;
+    }
+
+    .submit-btn {
+      background: linear-gradient(135deg, #10b981, #34d399);
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
+    }
+
+    .submit-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .submit-btn:hover::before {
+      left: 100%;
+    }
+
+    .floating-element {
+      position: absolute;
+      opacity: 0.7;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(180deg); }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.8s ease-out forwards;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    .fade-in-delay {
+      animation: fadeIn 0.8s ease-out 0.3s forwards;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .strength-indicator {
+      height: 4px;
+      background: #e5e7eb;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 0.5rem;
+    }
+
+    .strength-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981);
+      transition: width 0.3s ease;
+      border-radius: 2px;
+    }
+
+    .checkbox-custom {
+      appearance: none;
+      width: 1.25rem;
+      height: 1.25rem;
+      border: 2px solid #d1d5db;
+      border-radius: 4px;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .checkbox-custom:checked {
+      background: #10b981;
+      border-color: #10b981;
+    }
+
+    .checkbox-custom:checked::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    .leaf-pattern {
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2334d399' fill-opacity='0.1'%3E%3Cpath d='M30 30c0-11.046-8.954-20-20-20s-20 8.954-20 20 8.954 20 20 20 20-8.954 20-20zm0 0c0-11.046 8.954-20 20-20s20 8.954 20 20-8.954 20-20 20-20-8.954-20-20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+  </style>
+</head>
+<body class="hero-gradient min-h-screen flex items-center justify-center p-4 relative overflow-hidden leaf-pattern">
+
+  <!-- Floating Elements -->
+  <div class="floating-element top-20 left-10" style="animation-delay: 0s;">
+    <span class="text-4xl opacity-30">🌿</span>
+  </div>
+  <div class="floating-element top-32 right-20" style="animation-delay: 2s;">
+    <span class="text-3xl opacity-30">🌱</span>
+  </div>
+  <div class="floating-element bottom-32 left-20" style="animation-delay: 4s;">
+    <span class="text-5xl opacity-30">🍃</span>
+  </div>
+  <div class="floating-element top-1/2 right-10" style="animation-delay: 1s;">
+    <span class="text-2xl opacity-30">🌾</span>
+  </div>
+
+  <div class="glass-card rounded-3xl p-8 w-full max-w-md relative z-10 fade-in">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+        <span class="text-3xl">🌱</span>
+      </div>
+      <h2 class="text-3xl font-bold text-gray-800 mb-2">Bergabung dengan BumiSehat</h2>
+      <p class="text-gray-600">Mulai perjalanan hijau mu hari ini</p>
+    </div>
+
+    <!-- Registration Form -->
+    <form action="/register" method="post" class="space-y-4 fade-in-delay">
+      
+      <!-- Name Field -->
+      <div class="input-group">
+        <input
+          type="text"
+          name="name"
+          id="name"
+          required
+          class="input-field"
+          placeholder="Nama Lengkap"
+          autocomplete="name"
+        />
+        <span class="input-icon">👤</span>
+      </div>
+
+      <!-- Email Field -->
+      <div class="input-group">
+        <input
+          type="email"
+          name="email"
+          id="email"
+          required
+          class="input-field"
+          placeholder="Alamat Email"
+          autocomplete="email"
+        />
+        <span class="input-icon">📧</span>
+      </div>
+
+      <!-- Password Field -->
+      <div class="input-group">
+        <input
+          type="password"
+          name="password"
+          id="password"
+          required
+          class="input-field"
+          placeholder="Kata Sandi"
+          autocomplete="new-password"
+          minlength="6"
+          onkeyup="checkPasswordStrength(this.value)"
+        />
+        <span class="input-icon">🔒</span>
+        <div class="strength-indicator">
+          <div class="strength-bar" id="strengthBar"></div>
+        </div>
+        <p class="text-xs text-gray-500 mt-1" id="strengthText">Minimal 6 karakter</p>
+      </div>
+
+      <!-- Confirm Password Field -->
+      <div class="input-group">
+        <input
+          type="password"
+          name="password_confirmation"
+          id="password_confirmation"
+          required
+          class="input-field"
+          placeholder="Konfirmasi Kata Sandi"
+          autocomplete="new-password"
+          onkeyup="checkPasswordMatch()"
+        />
+        <span class="input-icon">🔐</span>
+        <p class="text-xs text-red-500 mt-1 hidden" id="passwordMismatch">Kata sandi tidak cocok</p>
+      </div>
+
+      <!-- Terms Agreement -->
+      <div class="flex items-center space-x-3 mt-6">
+        <input type="checkbox" id="terms" required class="checkbox-custom">
+        <label for="terms" class="text-sm text-gray-600 cursor-pointer">
+          Saya setuju dengan <a href="#" class="text-green-600 hover:underline font-medium">Syarat & Ketentuan</a> dan <a href="#" class="text-green-600 hover:underline font-medium">Kebijakan Privasi</a>
+        </label>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="submit-btn w-full text-white font-semibold py-4 rounded-xl mt-6 relative">
+        <span class="relative z-10">🚀 Daftar Sekarang</span>
+      </button>
+    </form>
+
+    <!-- Login Link -->
+    <div class="text-center mt-8 pt-6 border-t border-gray-200">
+      <p class="text-sm text-gray-600">
+        Sudah punya akun?
+        <a href="/login" class="text-green-600 hover:text-green-700 font-semibold hover:underline transition-colors ml-1">
+          Masuk di sini
+        </a>
+      </p>
+    </div>
+
+    <!-- Features Preview -->
+    <div class="mt-8 grid grid-cols-3 gap-4 text-center">
+      <div class="text-center">
+        <div class="text-2xl mb-1">📝</div>
+        <p class="text-xs text-gray-600">Catat Aktivitas</p>
+      </div>
+      <div class="text-center">
+        <div class="text-2xl mb-1">📊</div>
+        <p class="text-xs text-gray-600">Pantau Progres</p>
+      </div>
+      <div class="text-center">
+        <div class="text-2xl mb-1">🏆</div>
+        <p class="text-xs text-gray-600">Raih Badge</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function checkPasswordStrength(password) {
+      const strengthBar = document.getElementById('strengthBar');
+      const strengthText = document.getElementById('strengthText');
+      
+      let strength = 0;
+      let feedback = '';
+      
+      if (password.length >= 6) strength += 25;
+      if (password.match(/[a-z]/)) strength += 25;
+      if (password.match(/[A-Z]/)) strength += 25;
+      if (password.match(/[0-9]/)) strength += 25;
+      
+      strengthBar.style.width = strength + '%';
+      
+      if (strength < 50) {
+        feedback = 'Kata sandi lemah';
+        strengthBar.style.background = '#ef4444';
+      } else if (strength < 75) {
+        feedback = 'Kata sandi sedang';
+        strengthBar.style.background = '#f59e0b';
+      } else {
+        feedback = 'Kata sandi kuat';
+        strengthBar.style.background = '#10b981';
+      }
+      
+      strengthText.textContent = feedback;
+    }
+    
+    function checkPasswordMatch() {
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('password_confirmation').value;
+      const mismatchText = document.getElementById('passwordMismatch');
+      
+      if (confirmPassword && password !== confirmPassword) {
+        mismatchText.classList.remove('hidden');
+        document.getElementById('password_confirmation').style.borderColor = '#ef4444';
+      } else {
+        mismatchText.classList.add('hidden');
+        if (confirmPassword) {
+          document.getElementById('password_confirmation').style.borderColor = '#10b981';
+        }
+      }
+    }
+  </script>
