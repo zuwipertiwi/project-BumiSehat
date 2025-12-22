@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Edukasi - BumiSehat 🌿</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #1e3a8a, #3730a3, #7c3aed); }
+    .card-hover { transition: all 0.3s ease; }
+    .card-hover:hover { transform: translateY(-8px); box-shadow: 0 25px 50px rgba(0,0,0,0.15); }
+    .animate-fade-in { animation: fadeIn 0.8s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .glass-effect { backdrop-filter: blur(16px); background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); }
+    .modal { transition: all 0.3s ease; }
+    .modal.show { display: flex !important; }
+    .table-row:hover { background-color: #f9fafb; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- Navbar -->
+  <nav class="bg-white/10 backdrop-blur-md text-white px-6 py-4 shadow-lg sticky top-0 z-40 border-b border-white/20">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+          <span class="text-blue-600 text-2xl">👨‍💼</span>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold">BumiSehat Admin</h1>
+          <p class="text-xs opacity-80">Panel Manajemen</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-6">
+        <a href="/admin" class="hover:bg-white/20 px-4 py-2 rounded-lg">Dashboard</a>
+        <a href="/admin/aktivitas" class="hover:bg-white/20 px-4 py-2 rounded-lg">Aktivitas</a>
+        <a href="/admin/tips" class="hover:bg-white/20 px-4 py-2 rounded-lg">Tips</a>
+        <a href="/admin/edukasi" class="bg-white/20 px-4 py-2 rounded-lg font-medium">Edukasi</a>
+        <a href="/admin/logout" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Welcome Banner -->
+  <section class="py-8">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="glass-effect px-8 py-8 text-white rounded-3xl shadow-lg animate-fade-in">
+        <h1 class="text-3xl font-bold mb-2">📚 Kelola Artikel Edukasi</h1>
+        <p class="text-lg opacity-90">Tambah, edit, dan kelola konten edukatif untuk pengguna BumiSehat</p>
+        <div class="flex items-center mt-4 text-sm opacity-90">
+          <span class="mr-4" id="totalArticles">📊 Total: 6 artikel</span>
+          <span class="mr-4" id="publishedArticles">✅ Dipublikasi: 6</span>
+          <span id="draftArticles">📝 Draft: 0</span>
+        </div>
+        <p class="text-xs opacity-80 mt-2" id="currentDate"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Action Bar -->
+  <section class="max-w-7xl mx-auto px-6 mb-8">
+    <div class="bg-white rounded-3xl shadow-xl p-6 animate-fade-in card-hover">
+      <div class="flex flex-col lg:flex-row gap-6 items-center justify-between">
+        <div class="flex-1 relative">
+          <input type="text" id="searchInput" placeholder="Cari artikel..." 
+                 class="w-full px-6 py-4 rounded-2xl border-2 border-gray-200 focus:border-purple-500 focus:outline-none text-lg">
+          <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-2xl">🔍</span>
+        </div>
+        <div class="flex gap-3 flex-wrap">
+          <button onclick="openAddModal()" class="bg-gradient-to-r from-green-500 to-blue-500 text-white px-6 py-3 rounded-2xl font-semibold hover:from-green-600 hover:to-blue-600 transition flex items-center gap-2 shadow-lg">
+            <span>➕</span> Tambah Artikel
+          </button>
+          <select id="statusFilter" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-2xl font-semibold border-2 border-gray-200 focus:border-purple-500 focus:outline-none">
+            <option value="all">Semua Status</option>
+            <option value="published">Dipublikasi</option>
+            <option value="draft">Draft</option>
+          </select>
+          <select id="categoryFilter" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-2xl font-semibold border-2 border-gray-200 focus:border-purple-500 focus:outline-none">
+            <option value="all">Semua Kategori</option>
+            <option value="penanaman">Penanaman</option>
+            <option value="daur-ulang">Daur Ulang</option>
+            <option value="kompos">Kompos</option>
+            <option value="energi">Energi</option>
+            <option value="air">Air</option>
+            <option value="biodiversitas">Biodiversitas</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Articles Table -->
+  <section class="max-w-7xl mx-auto px-6 pb-12">
+    <div class="bg-white rounded-3xl shadow-xl overflow-hidden animate-fade-in card-hover">
+      <div class="bg-gradient-to-r from-purple-600 to-blue-600 px-8 py-6">
+        <h2 class="text-2xl font-bold text-white">Daftar Artikel</h2>
+        <p class="text-purple-100 text-sm">Kelola dan moderasi konten edukasi platform</p>
+      </div>
+      <div class="p-8">        
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b-2 border-gray-200">
+                <th class="text-left py-4 px-2 font-semibold text-gray-700">Artikel</th>
+                <th class="text-left py-4 px-2 font-semibold text-gray-700">Kategori</th>
+                <th class="text-left py-4 px-2 font-semibold text-gray-700">Penulis</th>
+                <th class="text-left py-4 px-2 font-semibold text-gray-700">Tanggal</th>
+                <th class="text-left py-4 px-2 font-semibold text-gray-700">Status</th>
+                <th class="text-left py-4 px-2 font-semibold text-gray-700">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="articlesTableBody">
+              <tr class="table-row border-b border-gray-100" data-category="unggulan" data-status="published">
+                <td class="py-4 px-2">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-16 h-16 bg-gradient-to-r from-green-400 to-blue-500 rounded-lg flex items-center justify-center text-2xl">🌍</div>
+                    <div>
+                      <h3 class="font-semibold text-gray-800">Revolusi Hijau: Cara Sederhana Menyelamatkan Planet</h3>
+                      <p class="text-sm text-gray-600">10 langkah mudah untuk dampak positif lingkungan...</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-4 px-2">
+                  <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-bold">UNGGULAN</span>
+                </td>
+                <td class="py-4 px-2 text-gray-700">Dr. Sari Lingkungan</td>
+                <td class="py-4 px-2 text-gray-700">25 Mei 2025</td>
+                <td class="py-4 px-2">
+                  <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">DIPUBLIKASI</span>
+                </td>
+                <td class="py-4 px-2">
+                  <div class="flex space-x-2">
+                    <button onclick="editArticle(1)" class="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 py-1 rounded-lg text-xs hover:from-blue-600 hover:to-purple-600 transition">Edit</button>
+                    <button onclick="deleteArticle(1)" class="bg-red-500 text-white px-3 py-1 rounded-lg text-xs hover:bg-red-600 transition">Hapus</button>
+                  </div>
+                </td>
+              </tr>
+              
+              <tr class="table-row border-b border-gray-100" data-category="penanaman" data-status="published">
+                <td class="py-4 px-2">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center text-2xl">🌱</div>
+                    <div>
+                      <h3 class="font-semibold text-gray-800">Panduan Lengkap Menanam Pohon di Rumah</h3>
+                      <p class="text-sm text-gray-600">Cara memilih bibit dan merawat pohon...</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-4 px-2">
+                  <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">PENANAMAN</span>
+                </td>
+                <td class="py-4 px-2 text-gray-700">Ahmad Hijau</td>
+                <td class="py-4 px-2 text-gray-700">22 Mei 2025</td>
+                <td class="py-4 px-2">
+                  <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">DIPUBLIKASI</span>
+                </td>
+                <td class="py-4 px-2">
+                  <div class="flex space-x-2">
+                    <button onclick="editArticle(2)" class="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 py-1 rounded-lg text-xs hover:from-blue-600 hover:to-purple-600 transition">Edit</button>
+                    <button onclick="deleteArticle(2)" class="bg-red-500 text-white px-3 py-1 rounded-lg text-xs hover:bg-red-600 transition">Hapus</button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr class="table-row border-b border-gray-100" data-category="daur-ulang" data-status="published">
+                <td class="py-4 px-2">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center text-2xl">♻️</div>
+                    <div>
+                      <h3 class="font-semibold text-gray-800">Kreasi Unik dari Sampah Plastik</h3>
+                      <p class="text-sm text-gray-600">Tutorial step-by-step mengubah sampah plastik...</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-4 px-2">
+                  <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-bold">DAUR ULANG</span>
+                </td>
+                <td class="py-4 px-2 text-gray-700">Lisa Kreatif</td>
+                <td class="py-4 px-2 text-gray-700">20 Mei 2025</td>
+                <td class="py-4 px-2">
+                  <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">DIPUBLIKASI</span>
+                </td>
+                <td class="py-4 px-2">
+                  <div class="flex space-x-2">
+                    <button onclick="editArticle(3)" class="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 py-1 rounded-lg text-xs hover:from-blue-600 hover:to-purple-600 transition">Edit</button>
+                    <button onclick="deleteArticle(3)" class="bg-red-500 text-white px-3 py-1 rounded-lg text-xs hover:bg-red-600 transition">Hapus</button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr class="table-row border-b border-gray-100" data-category="kompos" data-status="published">
+                <td class="py-4 px-2">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center text-2xl">🍃</div>
+                    <div>
+                      <h3 class="font-semibold text-gray-800">Membuat Kompos dari Sampah Dapur</h3>
+                      <p class="text-sm text-gray-600">Mengubah sisa makanan menjadi pupuk organik...</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-4 px-2">
+                  <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-bold">KOMPOS</span>
+                </td>
+                <td class="py-4 px-2 text-gray-700">Budi Organik</td>
+                <td class="py-4 px-2 text-gray-700">18 Mei 2025</td>
+                <td class="py-4 px-2">
+                  <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">DIPUBLIKASI</span>
+                </td>
+                <td class="py-4 px-2">
+                  <div class="flex space-x-2">
+                    <button onclick="editArticle(4)" class="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 py-1 rounded-lg text-xs hover:from-blue-600 hover:to-purple-600 transition">Edit</button>
+                    <button onclick="deleteArticle(4)" class="bg-red-500 text-white px-3 py-1 rounded-lg text-xs hover:bg-red-600 transition">Hapus</button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr class="table-row border-b border-gray-100" data-category="energi" data-status="published">
+                <td class="py-4 px-2">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg flex items-center justify-center text-2xl">💡</div>
+                    <div>
+                      <h3 class="font-semibold text-gray-800">Hemat Listrik dengan Teknologi Smart Home</h3>
+                      <p class="text-sm text-gray-600">Implementasi teknologi pintar untuk hemat energi...</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-4 px-2">
+                  <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-xs font-bold">ENERGI</span>
+                </td>
+                <td class="py-4 px-2 text-gray-700">Rina Teknologi</td>
+                <td class="py-4 px-2 text-gray-700">15 Mei 2025</td>
+                <td class="py-4 px-2">
+                  <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">DIPUBLIKASI</span>
+                </td>
+                <td class="py-4 px-2">
+                  <div class="flex space-x-2">
+                    <button onclick="editArticle(5)" class="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 py-1 rounded-lg text-xs hover:from-blue-600 hover:to-purple-600 transition">Edit</button>
+                    <button onclick="deleteArticle(5)" class="bg-red-500 text-white px-3 py-1 rounded-lg text-xs hover:bg-red-600 transition">Hapus</button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr class="table-row border-b border-gray-100" data-category="air" data-status="published">
+                <td class="py-4 px-2">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-16 h-16 bg-gradient-to-br from-teal-400 to-teal-600 rounded-lg flex items-center justify-center text-2xl">🌊</div>
+                    <div>
+                      <h3 class="font-semibold text-gray-800">Konservasi Air untuk Masa Depan</h3>
+                      <p class="text-sm text-gray-600">Strategi efektif menghemat air di rumah tangga...</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-4 px-2">
+                  <span class="bg-teal-100 text-teal-800 px-3 py-1 rounded-full text-xs font-bold">AIR</span>
+                </td>
+                <td class="py-4 px-2 text-gray-700">Maya Konservasi</td>
+                <td class="py-4 px-2 text-gray-700">12 Mei 2025</td>
+                <td class="py-4 px-2">
+                  <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">DIPUBLIKASI</span>
+                </td>
+                <td class="py-4 px-2">
+                  <div class="flex space-x-2">
+                    <button onclick="editArticle(6)" class="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 py-1 rounded-lg text-xs hover:from-blue-600 hover:to-purple-600 transition">Edit</button>
+                    <button onclick="deleteArticle(6)" class="bg-red-500 text-white px-3 py-1 rounded-lg text-xs hover:bg-red-600 transition">Hapus</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Add/Edit Modal -->
+  <div id="articleModal" class="modal fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-6" style="display: none;">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-screen overflow-y-auto">
+      <div class="bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-6 rounded-t-3xl">
+        <div class="flex items-center justify-between">
+          <h2 id="modalTitle" class="text-2xl font-bold text-white">Tambah Artikel Baru</h2>
+          <button onclick="closeModal()" class="text-white hover:text-gray-200 text-2xl">✕</button>
+        </div>
+      </div>
+      <div class="p-8">
+        <form id="articleForm" class="space-y-6">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Judul Artikel</label>
+              <input type="text" id="articleTitle" class="w-full px-4 py-3 rounded-2xl border-2 border-gray-200 focus:border-purple-500 focus:outline-none" required>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori</label>
+              <select id="articleCategory" class="w-full px-4 py-3 rounded-2xl border-2 border-gray-200 focus:border-purple-500 focus:outline-none" required>
+                <option value="">Pilih Kategori</option>
+                <option value="penanaman">Penanaman</option>
+                <option value="daur-ulang">Daur Ulang</option>
+                <option value="kompos">Kompos</option>
+                <option value="energi">Energi</option>
+                <option value="air">Air</option>
+                <option value="biodiversitas">Biodiversitas</option>
+                <option value="unggulan">Unggulan</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Penulis</label>
+              <input type="text" id="articleAuthor" class="w-full px-4 py-3 rounded-2xl border-2 border-gray-200 focus:border-purple-500 focus:outline-none" required>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Estimasi Waktu Baca (menit)</label>
+              <input type="number" id="readTime" class="w-full px-4 py-3 rounded-2xl border-2 border-gray-200 focus:border-purple-500 focus:outline-none" min="1" required>
+            </div>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Ringkasan/Preview</label>
+            <textarea id="articleSummary" rows="3" class="w-full px-4 py-3 rounded-2xl border-2 border-gray-200 focus:border-purple-500 focus:outline-none" placeholder="Tulis ringkasan singkat artikel..." required></textarea>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Konten Artikel</label>
+            <textarea id="articleContent" rows="8" class="w-full px-4 py-3 rounded-2xl border-2 border-gray-200 focus:border-purple-500 focus:outline-none" placeholder="Tulis konten lengkap artikel..." required></textarea>
+          </div>
+          
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+              <select id="articleStatus" class="w-full px-4 py-3 rounded-2xl border-2 border-gray-200 focus:border-purple-500 focus:outline-none" required>
+                <option value="draft">Draft</option>
+                <option value="published">Dipublikasi</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Emoji Icon</label>
+              <input type="text" id="articleIcon" class="w-full px-4 py-3 rounded-2xl border-2 border-gray-200 focus:border-purple-500 focus:outline-none" placeholder="🌱" maxlength="2">
+            </div>
+          </div>
+          
+          <div class="flex justify-end space-x-4 pt-6">
+            <button type="button" onclick="closeModal()" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-2xl font-semibold hover:bg-gray-300 transition">Batal</button>
+            <button type="submit" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-2xl font-semibold hover:from-blue-600 hover:to-purple-600 transition">Simpan Artikel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="deleteModal" class="modal fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-6" style="display: none;">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full">
+      <div class="p-8 text-center">
+        <div class="text-6xl mb-4">🗑️</div>
+        <h3 class="text-xl font-bold text-gray-800 mb-2">Hapus Artikel?</h3>
+        <p class="text-gray-600 mb-6">Artikel yang dihapus tidak dapat dikembalikan. Yakin ingin melanjutkan?</p>
+        <div class="flex justify-center space-x-4">
+          <button onclick="closeDeleteModal()" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-2xl font-semibold hover:bg-gray-300 transition">Batal</button>
+          <button onclick="confirmDelete()" class="px-6 py-3 bg-red-500 text-white rounded-2xl font-semibold hover:bg-red-600 transition">Hapus</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white/10 backdrop-blur-md text-white text-center py-6 border-t border-white/20">
+    <p>&copy; 2025 BumiSehat Admin Panel. Semua hak dilindungi.</p>
+    <p class="text-sm opacity-70 mt-1">Kelola platform dengan bijak dan bertanggung jawab</p>
+  </footer>
+
+  <script>
+    // Global variables
+    let articles = [];
+    let currentEditId = null;
+    let deleteTargetId = null;
+
+    // Display current date
+    function displayCurrentDate() {
+      const now = new Date();
+      const options = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      };
+      const formattedDate = now.toLocaleDateString('id-ID', options);
+      document.getElementById('currentDate').textContent = formattedDate;
+    }
+
+    // Modal functions
+    function openAddModal() {
+      document.getElementById('modalTitle').textContent = 'Tambah Artikel Baru';
+      document.getElementById('articleForm').reset();
+      currentEditId = null;
+      document.getElementById('articleModal').classList.add('show');
+    }
+
+    function editArticle(id) {
+      document.getElementById('modalTitle').textContent = 'Edit Artikel';
+      currentEditId = id;
+      
+      // Here you would normally load the article data
+      // For demo, we'll populate with sample data
+      document.getElementById('articleTitle').value = 'Sample Article Title';
+      document.getElementById('articleCategory').value = 'penanaman';
+      document.getElementById('articleAuthor').value = 'Sample Author';
+      document.getElementById('readTime').value = '5';
+      document.getElementById('articleSummary').value = 'Sample summary...';
+      document.getElementById('articleContent').value = 'Sample content...';
+     document.getElementById('articleStatus').value = 'published';
+     document.getElementById('articleIcon').value = '🌱';
+     
+     document.getElementById('articleModal').classList.add('show');
+   }
+
+   function closeModal() {
+     document.getElementById('articleModal').classList.remove('show');
+   }
+
+   function deleteArticle(id) {
+     deleteTargetId = id;
+     document.getElementById('deleteModal').classList.add('show');
+   }
+
+   function closeDeleteModal() {
+     document.getElementById('deleteModal').classList.remove('show');
+     deleteTargetId = null;
+   }
+
+   function confirmDelete() {
+     // Remove the row from the table
+     const row = document.querySelector(`[data-id="${deleteTargetId}"]`);
+     if (row) {
+       row.remove();
+     }
+     
+     // Update statistics
+     updateStatistics();
+     
+     closeDeleteModal();
+     
+     // Show success message
+     showToast('Artikel berhasil dihapus!', 'success');
+   }
+
+   // Form submission
+   document.getElementById('articleForm').addEventListener('submit', function(e) {
+     e.preventDefault();
+     
+     const formData = {
+       title: document.getElementById('articleTitle').value,
+       category: document.getElementById('articleCategory').value,
+       author: document.getElementById('articleAuthor').value,
+       readTime: document.getElementById('readTime').value,
+       summary: document.getElementById('articleSummary').value,
+       content: document.getElementById('articleContent').value,
+       status: document.getElementById('articleStatus').value,
+       icon: document.getElementById('articleIcon').value || '📄'
+     };
+
+     if (currentEditId) {
+       // Update existing article
+       updateArticleRow(currentEditId, formData);
+       showToast('Artikel berhasil diperbarui!', 'success');
+     } else {
+       // Add new article
+       addNewArticle(formData);
+       showToast('Artikel baru berhasil ditambahkan!', 'success');
+     }
+     
+     closeModal();
+     updateStatistics();
+   });
+
+   function addNewArticle(data) {
+     const tbody = document.getElementById('articlesTableBody');
+     const newId = Date.now(); // Simple ID generation
+     const today = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+     
+     const categoryColors = {
+       'penanaman': 'bg-green-100 text-green-800',
+       'daur-ulang': 'bg-blue-100 text-blue-800',
+       'kompos': 'bg-yellow-100 text-yellow-800',
+       'energi': 'bg-purple-100 text-purple-800',
+       'air': 'bg-teal-100 text-teal-800',
+       'biodiversitas': 'bg-pink-100 text-pink-800',
+       'unggulan': 'bg-yellow-100 text-yellow-800'
+     };
+     
+     const statusColors = {
+       'published': 'bg-green-100 text-green-800',
+       'draft': 'bg-gray-100 text-gray-800'
+     };
+     
+     const row = `
+       <tr class="table-row border-b border-gray-100" data-id="${newId}" data-category="${data.category}" data-status="${data.status}">
+         <td class="py-4 px-2">
+           <div class="flex items-center space-x-3">
+             <div class="w-16 h-16 bg-gradient-to-r from-green-400 to-blue-500 rounded-lg flex items-center justify-center text-2xl">${data.icon}</div>
+             <div>
+               <h3 class="font-semibold text-gray-800">${data.title}</h3>
+               <p class="text-sm text-gray-600">${data.summary.substring(0, 50)}...</p>
+             </div>
+           </div>
+         </td>
+         <td class="py-4 px-2">
+           <span class="${categoryColors[data.category] || 'bg-gray-100 text-gray-800'} px-3 py-1 rounded-full text-xs font-bold">${data.category.toUpperCase()}</span>
+         </td>
+         <td class="py-4 px-2 text-gray-700">${data.author}</td>
+         <td class="py-4 px-2 text-gray-700">${today}</td>
+         <td class="py-4 px-2">
+           <span class="${statusColors[data.status]} px-3 py-1 rounded-full text-xs font-bold">${data.status === 'published' ? 'DIPUBLIKASI' : 'DRAFT'}</span>
+         </td>
+         <td class="py-4 px-2">
+           <div class="flex space-x-2">
+             <button onclick="editArticle(${newId})" class="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 py-1 rounded-lg text-xs hover:from-blue-600 hover:to-purple-600 transition">Edit</button>
+             <button onclick="deleteArticle(${newId})" class="bg-red-500 text-white px-3 py-1 rounded-lg text-xs hover:bg-red-600 transition">Hapus</button>
+           </div>
+         </td>
+       </tr>
+     `;
+     
+     tbody.insertAdjacentHTML('afterbegin', row);
+   }
+
+   function updateArticleRow(id, data) {
+     // This would update the existing row with new data
+     // For demo purposes, we'll just show a success message
+     console.log('Updating article:', id, data);
+   }
+
+   // Search and filter functionality
+   document.getElementById('searchInput').addEventListener('input', filterArticles);
+   document.getElementById('statusFilter').addEventListener('change', filterArticles);
+   document.getElementById('categoryFilter').addEventListener('change', filterArticles);
+
+   function filterArticles() {
+     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+     const statusFilter = document.getElementById('statusFilter').value;
+     const categoryFilter = document.getElementById('categoryFilter').value;
+     const rows = document.querySelectorAll('#articlesTableBody tr');
+
+     rows.forEach(row => {
+       const title = row.querySelector('h3').textContent.toLowerCase();
+       const summary = row.querySelector('p').textContent.toLowerCase();
+       const status = row.dataset.status;
+       const category = row.dataset.category;
+
+       const matchesSearch = title.includes(searchTerm) || summary.includes(searchTerm);
+       const matchesStatus = statusFilter === 'all' || status === statusFilter;
+       const matchesCategory = categoryFilter === 'all' || category === categoryFilter;
+
+       if (matchesSearch && matchesStatus && matchesCategory) {
+         row.style.display = '';
+       } else {
+         row.style.display = 'none';
+       }
+     });
+   }
+
+   function updateStatistics() {
+     const rows = document.querySelectorAll('#articlesTableBody tr');
+     const total = rows.length;
+     const published = document.querySelectorAll('#articlesTableBody tr[data-status="published"]').length;
+     const drafts = document.querySelectorAll('#articlesTableBody tr[data-status="draft"]').length;
+
+     document.getElementById('totalArticles').textContent = `📊 Total: ${total} artikel`;
+     document.getElementById('publishedArticles').textContent = `✅ Dipublikasi: ${published}`;
+     document.getElementById('draftArticles').textContent = `📝 Draft: ${drafts}`;
+   }
+
+   function showToast(message, type) {
+     const toast = document.createElement('div');
+     toast.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg text-white font-semibold ${
+       type === 'success' ? 'bg-green-500' : 'bg-red-500'
+     }`;
+     toast.textContent = message;
+     document.body.appendChild(toast);
+
+     setTimeout(() => {
+       toast.remove();
+     }, 3000);
+   }
+
+   // Initialize
+   document.addEventListener('DOMContentLoaded', function() {
+     displayCurrentDate();
+     updateStatistics();
+   });
+ </script>
+</body>
+</html>

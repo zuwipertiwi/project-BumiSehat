@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kelola Aktivitas - Admin BumiSehat 🌿</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #1e3a8a, #3730a3, #7c3aed); }
+    .card-hover { transition: all 0.3s ease; }
+    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+    .animate-fade-in { animation: fadeIn 0.8s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .glass-effect { backdrop-filter: blur(16px); background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); }
+    .status-pending { background: linear-gradient(45deg, #fbbf24, #f59e0b); }
+    .status-approved { background: linear-gradient(45deg, #10b981, #059669); }
+    .status-rejected { background: linear-gradient(45deg, #ef4444, #dc2626); }
+
+    .fade-out {
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- Navbar -->
+  <nav class="bg-white/10 backdrop-blur-md text-white px-6 py-4 shadow-lg sticky top-0 z-40 border-b border-white/20">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+          <span class="text-blue-600 text-2xl">👨‍💼</span>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold">BumiSehat Admin</h1>
+          <p class="text-xs opacity-80">Kelola Aktivitas</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-6">
+        <a href="/admin" class="hover:bg-white/20 px-4 py-2 rounded-lg">Dashboard</a>
+        <a href="/admin/aktivitas" class="bg-white/20 px-4 py-2 rounded-lg font-medium">Aktivitas</a>
+        <a href="/admin/tips" class="hover:bg-white/20 px-4 py-2 rounded-lg">Tips</a>
+        <a href="/admin/edukasi" class="hover:bg-white/20 px-4 py-2 rounded-lg">Edukasi</a>
+        <a href="/admin/logout" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg">Logout</a=>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Header Section -->
+  <section class="py-6">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="glass-effect px-8 py-6 text-white rounded-3xl shadow-lg animate-fade-in">
+        <div class="flex justify-between items-center">
+          <div>
+            <h1 class="text-3xl font-bold mb-2">Kelola Aktivitas Pengguna 🌱</h1>
+            <p class="text-lg opacity-90">Moderasi dan pantau semua aktivitas ramah lingkungan</p>
+          </div>
+          <div class="text-right">
+            <div class="text-2xl font-bold" id="totalCount">{{ stats.total }}</div>
+            <div class="text-sm opacity-80">Total Aktivitas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filter & Stats Section -->
+  <section class="max-w-7xl mx-auto px-6 mb-8">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+      <!-- Quick Stats -->
+      <div class="bg-white rounded-2xl shadow-xl p-6 card-hover animate-fade-in">
+        <div class="flex items-center justify-between mb-3">
+          <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+            <span class="text-xl">⏳</span>
+          </div>
+          <span class="text-yellow-600 text-sm font-semibold bg-yellow-100 px-2 py-1 rounded-full">Pending</span>
+        </div>
+        <div class="text-2xl font-bold text-gray-800" id="pendingCount">{{ stats.pending }}</div>
+        <div class="text-gray-600 text-sm">Menunggu Review</div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-xl p-6 card-hover animate-fade-in">
+        <div class="flex items-center justify-between mb-3">
+          <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+            <span class="text-xl">✅</span>
+          </div>
+          <span class="text-green-600 text-sm font-semibold bg-green-100 px-2 py-1 rounded-full">Approved</span>
+        </div>
+        <div class="text-2xl font-bold text-gray-800" id="approvedCount">{{ stats.approved }}</div>
+        <div class="text-gray-600 text-sm">Disetujui</div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-xl p-6 card-hover animate-fade-in">
+        <div class="flex items-center justify-between mb-3">
+          <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+            <span class="text-xl">❌</span>
+          </div>
+          <span class="text-red-600 text-sm font-semibold bg-red-100 px-2 py-1 rounded-full">Rejected</span>
+        </div>
+        <div class="text-2xl font-bold text-gray-800" id="rejectedCount">{{ stats.rejected }}</div>
+        <div class="text-gray-600 text-sm">Ditolak</div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-xl p-6 card-hover animate-fade-in">
+        <div class="flex items-center justify-between mb-3">
+          <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+            <span class="text-xl">📊</span>
+          </div>
+          <span class="text-blue-600 text-sm font-semibold bg-blue-100 px-2 py-1 rounded-full">Hari Ini</span>
+        </div>
+        <div class="text-2xl font-bold text-gray-800" id="todayCount">{{ stats.today }}</div>
+        <div class="text-gray-600 text-sm">Aktivitas Baru</div>
+      </div>
+    </div>
+
+    {{--  <!-- Filter Controls -->
+    <div class="bg-white rounded-3xl shadow-xl p-8 animate-fade-in">
+      <div class="flex flex-wrap gap-4 items-center justify-between">
+        <div class="flex flex-wrap gap-4">
+          <!-- Status Filter -->
+          <select id="statusFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <option value="">Semua Status</option>
+            <option value="pending">Pending</option>
+            <option value="approved">Disetujui</option>
+            <option value="rejected">Ditolak</option>
+          </select>
+
+          <!-- Type Filter -->
+          <select id="typeFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <option value="">Semua Jenis</option>
+            <option value="Penanaman">Penanaman</option>
+            <option value="Daur Ulang">Daur Ulang</option>
+            <option value="Kompos">Kompos</option>
+            <option value="Hemat Energi">Hemat Energi</option>
+          </select>
+
+          <!-- Date Range -->
+          <input type="date" id="dateFrom" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <span class="text-gray-500">sampai</span>
+          <input type="date" id="dateTo" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        </div>
+
+        <div class="flex gap-3">
+          <button onclick="applyFilters()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold transition">
+            Filter
+          </button>
+          <button onclick="resetFilters()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-semibold transition">
+            Reset
+          </button>
+          <button onclick="exportData()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-semibold transition">
+            📊 Export
+          </button>
+        </div>
+      </div>
+    </div>  --}}
+  </section>
+
+  <!-- Activities List -->
+  <section class="max-w-7xl mx-auto px-6 pb-12">
+    <div class="bg-white rounded-3xl shadow-xl overflow-hidden animate-fade-in">
+      <div class="bg-gradient-to-r from-green-600 to-blue-600 px-8 py-6">
+        <h2 class="text-2xl font-bold text-white">Daftar Aktivitas</h2>
+        <p class="text-blue-100 text-sm">Kelola dan moderasi aktivitas pengguna</p>
+      </div>
+
+      <div class="p-8">
+        <div class="space-y-4" id="activitiesList">
+          @each(activity in aktivitasList)
+            <div class="activity-item border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition"
+                 data-status="{{ activity.status }}"
+                 data-type="{{ activity.kategori }}">
+              <div class="flex items-start justify-between">
+                <div class="flex items-start space-x-4">
+                  <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                    <span class="text-white text-xl">{{ activity.icon }}</span>
+                  </div>
+                  <div class="flex-1">
+                    <div class="flex items-center space-x-3 mb-2">
+                      <h4 class="text-lg font-bold text-gray-800">{{ activity.aktivitas }}</h4>
+                      <span class="status-{{ activity.status }} text-white text-xs px-3 py-1 rounded-full font-semibold">
+                        {{ activity.status.toUpperCase() }}
+                      </span>
+                    </div>
+                    <p class="text-gray-600 mb-3">{{ activity.deskripsi }}</p>
+                    <div class="flex items-center space-x-6 text-sm text-gray-500 mb-3">
+                      <span>👤 {{ activity.username }}</span>
+                      <span>📅 {{ activity.tanggal }}</span>
+                      <span>🏷️ {{ activity.kategori }}</span>
+                      <span>📍 {{ activity.lokasi }}</span>
+                    </div>
+
+                    @if(activity.manfaat)
+                      <div class="bg-green-50 border border-green-200 rounded-lg p-3">
+                        <p class="text-green-700 text-sm"><strong>Dampak Lingkungan:</strong> {{ activity.manfaat }}</p>
+                      </div>
+                    @endif
+
+                    @if(activity.status === 'ditolak' && activity.alasan_penolakan)
+                      <div class="bg-red-50 border border-red-200 rounded-lg p-3 mt-3">
+                        <p class="text-red-700 text-sm"><strong>Alasan Penolakan:</strong> {{ activity.alasan_penolakan }}</p>
+                      </div>
+                    @endif
+                  </div>
+                </div>
+                <div class="flex space-x-2">
+                  @if(activity.status === 'pending')
+                    <button onclick="approveActivity('{{ activity.id }}')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+                      ✅ Setujui
+                    </button>
+                    <button onclick="rejectActivity('{{ activity.id }}')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+                      ❌ Tolak
+                    </button>
+                  @elseif(activity.status === 'disetujui')
+                    <button onclick="revokeApproval('{{ activity.id }}')" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+                      🔄 Revoke
+                    </button>
+                  @elseif(activity.status === 'ditolak')
+                    <button onclick="reactivateActivity('{{ activity.id }}')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+                      🔄 Aktifkan
+                    </button>
+                  @endif
+                  <button onclick="viewDetails('{{ activity.id }}')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+                    👁️ Detail
+                  </button>
+                </div>
+              </div>
+            </div>
+          @else
+            <div class="text-center py-8">
+              <p class="text-gray-500">Belum ada aktivitas yang tersedia</p>
+            </div>
+          @endeach
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
+          <div class="text-sm text-gray-600">
+            Menampilkan 1-10 dari <span id="totalDisplayCount">8420</span> aktivitas
+          </div>
+          <div class="flex space-x-2">
+            <button class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition disabled:opacity-50" disabled>
+              ← Sebelumnya
+            </button>
+            <button class="px-4 py-2 bg-blue-500 text-white rounded-lg">1</button>
+            <button class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">2</button>
+            <button class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">3</button>
+            <span class="px-4 py-2">...</span>
+            <button class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+              Selanjutnya →
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Detail Modal (Hidden by default) -->
+  <div id="detailModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-3xl max-w-3xl w-full mx-4 max-h-96 overflow-y-auto">
+      <div class="bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-6 rounded-t-3xl">
+        <h3 class="text-2xl font-bold text-white">Detail Aktivitas</h3>
+      </div>
+      <div class="p-8">
+        <div id="modalContent">
+          <!-- Content will be loaded here -->
+        </div>
+        <div class="flex justify-end space-x-4 mt-6">
+          <button onclick="closeModal()" class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white/10 backdrop-blur-md text-white text-center py-6 border-t border-white/20">
+    <p>&copy; 2025 BumiSehat Admin Panel. Kelola aktivitas dengan bijak.</p>
+  </footer>
+
+  <script>
+    // Initialize data storage
+    let activitiesData = {
+      pending: {{ stats.pending }},
+      approved: {{ stats.approved }},
+      rejected: {{ stats.rejected }},
+      today: {{ stats.today }},
+      total: {{ stats.total }}
+    };
+
+    // Filter functions
+    function applyFilters() {
+      const status = document.getElementById('statusFilter').value;
+      const type = document.getElementById('typeFilter').value;
+      const dateFrom = document.getElementById('dateFrom').value;
+      const dateTo = document.getElementById('dateTo').value;
+
+      const activities = document.querySelectorAll('.activity-item');
+      let visibleCount = 0;
+
+      activities.forEach(activity => {
+        let show = true;
+
+        if (status && activity.dataset.status !== status) {
+          show = false;
+        }
+
+        if (type && activity.dataset.type !== type) {
+          show = false;
+        }
+
+        // Add date filtering logic here if needed
+        // if (dateFrom && dateTo) { ... }
+
+        activity.style.display = show ? 'block' : 'none';
+        if (show) visibleCount++;
+      });
+
+      // Update displayed count
+      document.getElementById('totalDisplayCount').textContent = visibleCount;
+
+      // Show notification
+      showNotification('Filter diterapkan - ' + visibleCount + ' aktivitas ditemukan', 'success');
+    }
+
+    function resetFilters() {
+      document.getElementById('statusFilter').value = '';
+      document.getElementById('typeFilter').value = '';
+      document.getElementById('dateFrom').value = '';
+      document.getElementById('dateTo').value = '';
+
+      const activities = document.querySelectorAll('.activity-item');
+      activities.forEach(activity => {
+        activity.style.display = 'block';
+      });
+
+      // Reset displayed count
+      document.getElementById('totalDisplayCount').textContent = activitiesData.total;
+
+      showNotification('Filter direset', 'info');
+    }
+
+    // Activity actions
+    async function approveActivity(id) {
+      if (confirm('Apakah Anda yakin ingin menyetujui aktivitas ini?')) {
+        try {
+          const response = await fetch(`/admin/aktivitas/${id}/status`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              status: 'disetujui'
+            })
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            showNotification('Aktivitas berhasil disetujui!', 'success');
+            // Update UI
+            updateActivityStatus(id, 'disetujui');
+            // Update counters
+            activitiesData.pending--;
+            activitiesData.approved++;
+            updateCounters();
+          } else {
+            throw new Error(result.message);
+          }
+        } catch (error) {
+          console.error('Error approving activity:', error);
+          showNotification('Gagal menyetujui aktivitas: ' + error.message, 'error');
+        }
+      }
+    }
+
+    async function rejectActivity(id) {
+      const reason = prompt('Alasan penolakan (opsional):');
+      if (reason !== null) {
+        try {
+          const response = await fetch(`/admin/aktivitas/${id}/status`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              status: 'ditolak',
+              alasan_penolakan: reason
+            })
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            showNotification('Aktivitas ditolak!', 'error');
+            // Update UI
+            updateActivityStatus(id, 'ditolak');
+            // Add rejection reason
+            addRejectionReason(id, reason);
+            // Update counters
+            activitiesData.pending--;
+            activitiesData.rejected++;
+            updateCounters();
+          } else {
+            throw new Error(result.message);
+          }
+        } catch (error) {
+          console.error('Error rejecting activity:', error);
+          showNotification('Gagal menolak aktivitas: ' + error.message, 'error');
+        }
+      }
+    }
+
+    async function viewDetails(id) {
+      try {
+        const response = await fetch(`/admin/aktivitas/${id}`);
+        const activity = await response.json();
+
+        if (!activity) {
+          showNotification('Aktivitas tidak ditemukan', 'error');
+          return;
+        }
+
+        const statusColors = {
+          pending: 'bg-yellow-100 text-yellow-800',
+          disetujui: 'bg-green-100 text-green-800',
+          ditolak: 'bg-red-100 text-red-800'
+        };
+
+        const statusIcons = {
+          pending: '⏳',
+          disetujui: '✅',
+          ditolak: '❌'
+        };
+
+        let modalContent = `
+          <div class="space-y-6">
+            <div class="border-b pb-4">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-2xl font-bold text-gray-800">${activity.deskripsi}</h4>
+                <span class="${statusColors[activity.status]} px-3 py-1 rounded-full text-sm font-semibold">
+                  ${statusIcons[activity.status]} ${activity.status.toUpperCase()}
+                </span>
+              </div>
+              <div class="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                <div><strong>Pengguna:</strong> ${activity.user_id.name}</div>
+                <div><strong>Tanggal:</strong> ${new Date(activity.tanggal).toLocaleDateString('id-ID')}</div>
+                <div><strong>Jenis:</strong> ${activity.kategori_id.nama}</div>
+                <div><strong>Lokasi:</strong> ${activity.lokasi || '-'}</div>
+              </div>
+            </div>
+
+            <div>
+              <h5 class="font-semibold text-gray-800 mb-2">Deskripsi Aktivitas</h5>
+              <p class="text-gray-600 leading-relaxed">${activity.deskripsi}</p>
+            </div>
+
+            ${activity.manfaat ? `
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+              <h5 class="font-semibold text-green-800 mb-2">Dampak Lingkungan</h5>
+              <p class="text-green-700 text-sm">${activity.manfaat}</p>
+            </div>
+            ` : ''}
+
+            ${activity.alasan_penolakan ? `
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+              <h5 class="font-semibold text-red-800 mb-2">Alasan Penolakan</h5>
+              <p class="text-red-700 text-sm">${activity.alasan_penolakan}</p>
+            </div>
+            ` : ''}
+
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h5 class="font-semibold text-blue-800 mb-2">Informasi Tambahan</h5>
+              <div class="text-sm text-blue-700 space-y-1">
+                <p><strong>ID Aktivitas:</strong> ${activity._id}</p>
+                <p><strong>Waktu Submit:</strong> ${new Date(activity.createdAt).toLocaleString('id-ID')}</p>
+                <p><strong>Kategori:</strong> ${activity.kategori_id.nama}</p>
+                <p><strong>Status:</strong> ${activity.status}</p>
+              </div>
+            </div>
+
+            ${activity.status === 'pending' ? `
+            <div class="flex justify-end space-x-4 mt-6">
+              <button onclick="approveActivity('${activity._id}')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+                ✅ Setujui
+              </button>
+              <button onclick="rejectActivity('${activity._id}')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+                ❌ Tolak
+              </button>
+            </div>
+            ` : ''}
+          </div>
+        `;
+
+        document.getElementById('modalContent').innerHTML = modalContent;
+        document.getElementById('detailModal').classList.remove('hidden');
+
+      } catch (error) {
+        console.error('Error loading activity details:', error);
+        showNotification('Gagal memuat detail aktivitas', 'error');
+      }
+    }
+
+    async function revokeApproval(id) {
+      if (confirm('Apakah Anda yakin ingin mencabut persetujuan aktivitas ini?')) {
+        try {
+          const response = await fetch(`/admin/aktivitas/${id}/revoke`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            showNotification('Persetujuan aktivitas dicabut!', 'warning');
+            // Update UI
+            updateActivityStatus(id, 'pending');
+            // Update counters
+            activitiesData.approved--;
+            activitiesData.pending++;
+            updateCounters();
+          } else {
+            throw new Error(result.message);
+          }
+        } catch (error) {
+          console.error('Error revoking activity:', error);
+          showNotification('Gagal mencabut persetujuan: ' + error.message, 'error');
+        }
+      }
+    }
+
+    async function reactivateActivity(id) {
+  if (confirm('Apakah Anda yakin ingin mengaktifkan kembali aktivitas ini?')) {
+    try {
+      const response = await fetch(`/admin/aktivitas/${id}/reactivate`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        showNotification('Aktivitas berhasil diaktifkan kembali!', 'success');
+
+        // Update UI
+        updateActivityStatus(id, 'pending');
+
+        // Remove rejection reason if exists
+        removeRejectionReason(id);
+
+        // Update counters
+        activitiesData.rejected--;
+        activitiesData.pending++;
+        updateCounters();
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (error) {
+      console.error('Error reactivating activity:', error);
+      showNotification('Gagal mengaktifkan aktivitas: ' + error.message, 'error');
+    }
+  }
+}
+
+// Update removeRejectionReason function to handle async operations
+async function removeRejectionReason(id) {
+  const activities = document.querySelectorAll('.activity-item');
+  activities.forEach((activity, index) => {
+    if (index + 1 == id) {
+      const rejectionReason = activity.querySelector('.rejection-reason');
+      if (rejectionReason) {
+        rejectionReason.classList.add('fade-out');
+        setTimeout(() => {
+          rejectionReason.remove();
+        }, 300);
+      }
+    }
+  });
+}
+
+    function updateActivityStatus(id, status) {
+      const activities = document.querySelectorAll('.activity-item');
+      activities.forEach((activity, index) => {
+        if (index + 1 == id) {
+          activity.dataset.status = status;
+
+          // Update status badge
+          const statusBadge = activity.querySelector('.status-pending, .status-approved, .status-rejected');
+          if (statusBadge) {
+            statusBadge.className = `status-${status} text-white text-xs px-3 py-1 rounded-full font-semibold`;
+            statusBadge.textContent = status.toUpperCase();
+          }
+
+          // Update action buttons
+          updateActionButtons(activity, status, id);
+        }
+      });
+    }
+
+    function updateActionButtons(activityElement, status, id) {
+  const buttonContainer = activityElement.querySelector('.flex.space-x-2');
+
+  if (status === 'pending') {
+    buttonContainer.innerHTML = `
+      <button onclick="approveActivity('${id}')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+        ✅ Setujui
+      </button>
+      <button onclick="rejectActivity('${id}')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+        ❌ Tolak
+      </button>
+      <button onclick="viewDetails('${id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+        👁️ Detail
+      </button>
+    `;
+  } else if (status === 'disetujui') {
+    buttonContainer.innerHTML = `
+      <button onclick="revokeApproval('${id}')" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+        🔄 Revoke
+      </button>
+      <button onclick="viewDetails('${id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+        👁️ Detail
+      </button>
+    `;
+  } else if (status === 'ditolak') {
+    buttonContainer.innerHTML = `
+      <button onclick="reactivateActivity('${id}')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+        🔄 Aktifkan
+      </button>
+      <button onclick="viewDetails('${id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+        👁️ Detail
+      </button>
+    `;
+  }
+}
+
+    function addRejectionReason(id, reason) {
+      if (!reason || reason.trim() === '') return;
+
+      const activities = document.querySelectorAll('.activity-item');
+      activities.forEach((activity, index) => {
+        if (index + 1 == id) {
+          const description = activity.querySelector('.text-gray-600');
+          const rejectionBox = document.createElement('div');
+          rejectionBox.className = 'bg-red-50 border border-red-200 rounded-lg p-3 mb-3 rejection-reason';
+          rejectionBox.innerHTML = `<p class="text-red-700 text-sm"><strong>Alasan Penolakan:</strong> ${reason}</p>`;
+
+          // Insert after description
+          description.parentNode.insertBefore(rejectionBox, description.nextSibling.nextSibling);
+        }
+      });
+    }
+
+
+
+    function updateCounters() {
+  // Update the UI counters
+  document.getElementById('pendingCount').textContent = activitiesData.pending;
+  document.getElementById('approvedCount').textContent = activitiesData.approved;
+  document.getElementById('rejectedCount').textContent = activitiesData.rejected;
+  document.getElementById('totalCount').textContent = activitiesData.total;
+
+  // Also update the total display count if no filters are active
+  if (!document.getElementById('statusFilter').value &&
+      !document.getElementById('typeFilter').value) {
+    document.getElementById('totalDisplayCount').textContent = activitiesData.total;
+  }
+}
+
+    function closeModal() {
+      document.getElementById('detailModal').classList.add('hidden');
+    }
+
+    function exportData() {
+      const statusFilter = document.getElementById('statusFilter').value;
+      const typeFilter = document.getElementById('typeFilter').value;
+      const dateFrom = document.getElementById('dateFrom').value;
+      const dateTo = document.getElementById('dateTo').value;
+
+      let exportInfo = 'Mengekspor data aktivitas';
+      if (statusFilter || typeFilter || dateFrom || dateTo) {
+        exportInfo += ' dengan filter yang diterapkan';
+      }
+
+      showNotification(exportInfo + '. File akan segera diunduh...', 'info');
+
+      // Simulate export process
+      setTimeout(() => {
+        showNotification('Data berhasil diekspor ke file Excel!', 'success');
+      }, 2000);
+    }
+
+    function showNotification(message, type = 'info') {
+      const colors = {
+        success: 'bg-green-500',
+        error: 'bg-red-500',
+        warning: 'bg-orange-500',
+        info: 'bg-blue-500'
+      };
+
+      const notification = document.createElement('div');
+      notification.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300`;
+      notification.textContent = message;
+
+      document.body.appendChild(notification);
+
+      // Animate in
+      setTimeout(() => {
+        notification.classList.remove('translate-x-full');
+      }, 100);
+
+      // Auto remove after 3 seconds
+      setTimeout(() => {
+        notification.classList.add('translate-x-full');
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+          }
+        }, 300);
+      }, 3000);
+    }
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+      updateCounters();
+
+      // Add keyboard shortcuts
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          closeModal();
+        }
+      });
+
+      // Close modal when clicking outside
+      document.getElementById('detailModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+          closeModal();
+        }
+      });
+
+      console.log('🌿 Admin Panel BumiSehat siap digunakan!');
+    });
+
+    // Auto-refresh data every 30 seconds
+    setInterval(() => {
+      // Simulate data updates
+      activitiesData.today = Math.max(0, activitiesData.today + Math.floor(Math.random() * 3) - 1);
+      document.getElementById('todayCount').textContent = activitiesData.today;
+    }, 30000);
+  </script>
+
+</body>
+</html>

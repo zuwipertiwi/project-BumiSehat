@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard - BumiSehat 🌿</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #1e3a8a, #3730a3, #7c3aed); }
+    .card-hover { transition: all 0.3s ease; }
+    .card-hover:hover { transform: translateY(-8px); box-shadow: 0 25px 50px rgba(0,0,0,0.15); }
+    .animate-fade-in { animation: fadeIn 0.8s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .glass-effect { backdrop-filter: blur(16px); background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- Navbar -->
+  <nav class="bg-white/10 backdrop-blur-md text-white px-6 py-4 shadow-lg sticky top-0 z-40 border-b border-white/20">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+          <span class="text-blue-600 text-2xl">👨‍💼</span>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold">BumiSehat Admin</h1>
+          <p class="text-xs opacity-80">Panel Manajemen</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-6">
+        <a href="/admin" class="bg-white/20 px-4 py-2 rounded-lg font-medium">Dashboard</a>
+        <a href="/admin/aktivitas" class="hover:bg-white/20 px-4 py-2 rounded-lg">Aktivitas</a>
+        <a href="/admin/tips" class="hover:bg-white/20 px-4 py-2 rounded-lg">Tips</a>
+        <a href="/admin/edukasi" class="hover:bg-white/20 px-4 py-2 rounded-lg">Edukasi</a>
+        <a href="/admin/logout" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Welcome Banner -->
+  <section class="py-8">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="glass-effect px-8 py-8 text-white rounded-3xl shadow-lg animate-fade-in">
+        <h1 class="text-3xl font-bold mb-2">
+          Selamat Datang, Admin
+          @if(auth && auth.admin)
+            {{ auth.admin.nama }}
+          @endif
+          ! 🔧
+        </h1>
+        <p class="text-lg opacity-90">Kelola platform BumiSehat dengan mudah dan efisien</p>
+        <p class="text-sm opacity-80 mt-2" id="currentDate"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Stats Cards -->
+  <section class="max-w-7xl mx-auto px-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+      <!-- Total Users -->
+      <div class="bg-white rounded-2xl shadow-xl p-6 card-hover animate-fade-in">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+            <span class="text-2xl">👥</span>
+          </div>
+          <span class="text-blue-600 text-sm font-semibold bg-blue-100 px-2 py-1 rounded-full">Pengguna</span>
+        </div>
+        <div class="text-2xl font-bold text-gray-800 mb-1">{{ adminStats.totalPengguna }}</div>
+        <div class="text-gray-600 text-sm">Total Pengguna</div>
+        <div class="text-blue-600 text-xs mt-2">{{ adminStats.penggunaAktif }} pengguna aktif minggu ini</div>
+      </div>
+
+      <!-- Total Activities -->
+      <div class="bg-white rounded-2xl shadow-xl p-6 card-hover animate-fade-in">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+            <span class="text-2xl">🌱</span>
+          </div>
+          <span class="text-green-600 text-sm font-semibold bg-green-100 px-2 py-1 rounded-full">Aktivitas</span>
+        </div>
+        <div class="text-2xl font-bold text-gray-800 mb-1">{{ adminStats.totalAktivitas }}</div>
+        <div class="text-gray-600 text-sm">Total Aktivitas</div>
+        <div class="text-green-600 text-xs mt-2">+{{ adminStats.aktivitasHariIni }} aktivitas hari ini</div>
+      </div>
+
+      <!-- Total Tips -->
+      <div class="bg-white rounded-2xl shadow-xl p-6 card-hover animate-fade-in">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+            <span class="text-2xl">💡</span>
+          </div>
+          <span class="text-yellow-600 text-sm font-semibold bg-yellow-100 px-2 py-1 rounded-full">Tips</span>
+        </div>
+        <div class="text-2xl font-bold text-gray-800 mb-1">{{ adminStats.totalTips }}</div>
+        <div class="text-gray-600 text-sm">Tips Tersedia</div>
+        <div class="text-yellow-600 text-xs mt-2">Tips Aktif</div>
+      </div>
+
+      <!-- Total Articles -->
+      <div class="bg-white rounded-2xl shadow-xl p-6 card-hover animate-fade-in">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+            <span class="text-2xl">📚</span>
+          </div>
+          <span class="text-purple-600 text-sm font-semibold bg-purple-100 px-2 py-1 rounded-full">Artikel</span>
+        </div>
+        <div class="text-2xl font-bold text-gray-800 mb-1">{{ adminStats.totalArtikel }}</div>
+        <div class="text-gray-600 text-sm">Artikel Edukasi</div>
+        <div class="text-purple-600 text-xs mt-2">{{ adminStats.totalArtikel - 5 }} artikel terpublikasi</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <section class="max-w-7xl mx-auto px-6 pb-12">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+      <!-- Left Column -->
+      <div class="lg:col-span-2 space-y-8">
+
+        <!-- Quick Management Actions -->
+        <div class="bg-white rounded-3xl shadow-xl overflow-hidden card-hover animate-fade-in">
+          <div class="bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-6">
+            <h2 class="text-2xl font-bold text-white">Manajemen Cepat</h2>
+            <p class="text-blue-100 text-sm">Akses fitur utama dengan sekali klik</p>
+          </div>
+          <div class="p-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <a href="/admin/aktivitas" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-6 px-6 rounded-2xl transition-all duration-300 flex items-center shadow-lg group">
+                <span class="mr-4 text-3xl group-hover:scale-110 transition-transform">🌱</span>
+                <div class="text-left">
+                  <div class="font-bold text-lg">Kelola Aktivitas</div>
+                  <div class="text-sm opacity-90">Moderasi aktivitas pengguna</div>
+                </div>
+              </a>
+
+              <a href="/admin/tips" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-6 px-6 rounded-2xl transition-all duration-300 flex items-center shadow-lg group">
+                <span class="mr-4 text-3xl group-hover:scale-110 transition-transform">💡</span>
+                <div class="text-left">
+                  <div class="font-bold text-lg">Kelola Tips</div>
+                  <div class="text-sm opacity-90">Tambah & edit tips lingkungan</div>
+                </div>
+              </a>
+
+              <a href="/admin/edukasi" class="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-6 px-6 rounded-2xl transition-all duration-300 flex items-center shadow-lg group">
+                <span class="mr-4 text-3xl group-hover:scale-110 transition-transform">📚</span>
+                <div class="text-left">
+                  <div class="font-bold text-lg">Kelola Edukasi</div>
+                  <div class="text-sm opacity-90">Manajemen artikel edukasi</div>
+                </div>
+              </a>
+
+              <a href="/admin/users" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-6 px-6 rounded-2xl transition-all duration-300 flex items-center shadow-lg group">
+                <span class="mr-4 text-3xl group-hover:scale-110 transition-transform">👥</span>
+                <div class="text-left">
+                  <div class="font-bold text-lg">Manajemen User</div>
+                  <div class="text-sm opacity-90">Kelola akun pengguna</div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activities Log -->
+        <div class="bg-white rounded-3xl shadow-xl overflow-hidden card-hover animate-fade-in">
+          <div class="bg-gradient-to-r from-green-600 to-blue-600 px-8 py-6">
+            <h2 class="text-2xl font-bold text-white">Aktivitas Terbaru Platform</h2>
+          </div>
+          <div class="p-8">
+            <div class="space-y-4">
+              @if(recentActivities && recentActivities.length > 0)
+                @each(activity in recentActivities)
+                  <div class="flex items-center space-x-4 p-4 bg-gray-50 hover:bg-gray-100 rounded-2xl transition">
+                    <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                      <span class="text-white text-sm">🌱</span>
+                    </div>
+                    <div class="flex-1">
+                      <p class="font-medium text-gray-800">{{ activity.username }} - {{ activity.aktivitas }}</p>
+                      <p class="text-sm text-gray-600">{{ activity.tanggal }} - {{ activity.kategori }}</p>
+                    </div>
+                    <div class="px-3 py-1 rounded-full text-xs font-semibold
+                      {{ activity.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                         activity.status === 'disetujui' ? 'bg-green-100 text-green-800' :
+                         'bg-red-100 text-red-800' }}">
+                      {{ activity.status }}
+                    </div>
+                  </div>
+                @endeach
+              @else
+                <div class="text-center py-8">
+                  <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-3xl">📊</span>
+                  </div>
+                  <p class="text-gray-600">Belum ada aktivitas platform hari ini</p>
+                </div>
+              @endif
+            </div>
+
+            <div class="mt-6 text-center">
+              <a href="/admin/aktivitas" class="inline-flex items-center text-purple-600 hover:text-purple-700 font-semibold bg-purple-100 hover:bg-purple-200 px-6 py-3 rounded-2xl transition">
+                Lihat Log Lengkap
+                <span class="ml-2">→</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div class="space-y-8">
+
+        <!-- System Status -->
+        <div class="bg-white rounded-3xl shadow-xl p-8 card-hover animate-fade-in">
+          <h3 class="text-xl font-bold text-gray-800 mb-6 text-center">Status Sistem</h3>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between p-3 bg-green-50 rounded-xl">
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+                <span class="text-sm font-medium">Server Status</span>
+              </div>
+              <span class="text-green-600 text-sm font-bold">Online</span>
+            </div>
+
+            <div class="flex items-center justify-between p-3 bg-green-50 rounded-xl">
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+                <span class="text-sm font-medium">Database</span>
+              </div>
+              <span class="text-green-600 text-sm font-bold">Aktif</span>
+            </div>
+
+            <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-xl">
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-yellow-500 rounded-full mr-3"></div>
+                <span class="text-sm font-medium">Storage</span>
+              </div>
+              <span class="text-yellow-600 text-sm font-bold">{{ storageUsage || 78 }}%</span>
+            </div>
+
+            <div class="flex items-center justify-between p-3 bg-blue-50 rounded-xl">
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
+                <span class="text-sm font-medium">Active Users</span>
+              </div>
+              <span class="text-blue-600 text-sm font-bold">{{ activeUsers || 342 }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Stats Chart -->
+        <div class="bg-white rounded-3xl shadow-xl p-8 card-hover animate-fade-in">
+          <h3 class="text-xl font-bold text-gray-800 mb-6 text-center">Aktivitas Mingguan</h3>
+          <div class="relative h-48">
+            <canvas id="weeklyChart" class="w-full h-full"></canvas>
+          </div>
+          <div class="mt-4 text-center">
+            <div class="flex justify-center space-x-4 text-xs">
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                <span>Aktivitas</span>
+              </div>
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                <span>Pengguna Baru</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Actions Needed -->
+        <div class="bg-white rounded-3xl shadow-xl p-8 card-hover animate-fade-in">
+          <h3 class="text-xl font-bold text-gray-800 mb-6 text-center">Perlu Perhatian</h3>
+          <div class="space-y-4">
+            @if(pendingReviews && pendingReviews > 0)
+              <div class="bg-orange-100 p-4 rounded-2xl">
+                <div class="flex items-center mb-2">
+                  <span class="text-2xl mr-3">⏳</span>
+                  <h4 class="font-bold text-orange-800">Review Pending</h4>
+                </div>
+                <p class="text-orange-700 text-sm">{{ pendingReviews }} aktivitas menunggu review moderasi</p>
+                <a href="/admin/aktivitas?status=pending" class="text-orange-600 hover:text-orange-700 text-xs font-semibold mt-2 inline-block">
+                  Review Sekarang →
+                </a>
+              </div>
+            @endif
+
+            @if(reportedContent && reportedContent > 0)
+              <div class="bg-red-100 p-4 rounded-2xl">
+                <div class="flex items-center mb-2">
+                  <span class="text-2xl mr-3">🚨</span>
+                  <h4 class="font-bold text-red-800">Konten Dilaporkan</h4>
+                </div>
+                <p class="text-red-700 text-sm">{{ reportedContent }} konten dilaporkan pengguna</p>
+                <a href="/admin/reports" class="text-red-600 hover:text-red-700 text-xs font-semibold mt-2 inline-block">
+                  Lihat Laporan →
+                </a>
+              </div>
+            @endif
+
+            @if(!pendingReviews && !reportedContent)
+              <div class="text-center py-6">
+                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <span class="text-2xl">✅</span>
+                </div>
+                <p class="text-green-700 font-medium">Semua baik-baik saja!</p>
+                <p class="text-green-600 text-sm">Tidak ada yang perlu ditinjau</p>
+              </div>
+            @endif
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-white/10 backdrop-blur-md text-white text-center py-6 border-t border-white/20">
+    <p>&copy; 2025 BumiSehat Admin Panel. Semua hak dilindungi.</p>
+    <p class="text-sm opacity-70 mt-1">Kelola platform dengan bijak dan bertanggung jawab</p>
+  </footer>
+
+  <script>
+    // Menampilkan tanggal saat ini
+    function displayCurrentDate() {
+      const now = new Date();
+      const options = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      };
+      const formattedDate = now.toLocaleDateString('id-ID', options);
+      document.getElementById('currentDate').textContent = formattedDate;
+    }
+
+    // Simple chart simulation (you can replace with actual chart library)
+    function drawWeeklyChart() {
+      const canvas = document.getElementById('weeklyChart');
+      if (!canvas) return;
+
+      const ctx = canvas.getContext('2d');
+      const width = canvas.width = canvas.offsetWidth;
+      const height = canvas.height = canvas.offsetHeight;
+
+      // Sample data for the week
+      const days = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+      const activities = [45, 52, 48, 61, 55, 42, 38];
+      const newUsers = [12, 18, 15, 23, 19, 14, 11];
+
+      const maxValue = Math.max(...activities, ...newUsers);
+      const barWidth = width / (days.length * 2 + 1);
+
+      // Clear canvas
+      ctx.clearRect(0, 0, width, height);
+
+      // Draw bars
+      days.forEach((day, index) => {
+        const x = (index * 2 + 1) * barWidth;
+
+        // Activities bar (green)
+        const activityHeight = (activities[index] / maxValue) * (height - 40);
+        ctx.fillStyle = '#10b981';
+        ctx.fillRect(x, height - activityHeight - 20, barWidth * 0.8, activityHeight);
+
+        // New users bar (blue)
+        const userHeight = (newUsers[index] / maxValue) * (height - 40);
+        ctx.fillStyle = '#3b82f6';
+        ctx.fillRect(x + barWidth * 0.2, height - userHeight - 20, barWidth * 0.8, userHeight);
+
+        // Day labels
+        ctx.fillStyle = '#6b7280';
+        ctx.font = '12px Poppins';
+        ctx.textAlign = 'center';
+        ctx.fillText(day, x + barWidth * 0.5, height - 5);
+      });
+    }
+
+    // Inisialisasi saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', function() {
+      displayCurrentDate();
+      setTimeout(drawWeeklyChart, 100);
+    });
+
+    // Update waktu setiap menit
+    setInterval(displayCurrentDate, 60000);
+
+    // Resize chart when window resizes
+    window.addEventListener('resize', () => {
+      setTimeout(drawWeeklyChart, 100);
+    });
+  </script>
+
+</body>
+</html>
