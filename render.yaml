@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: bumisehat
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: node build/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        sync: false
+      - key: APP_KEY
+        sync: false

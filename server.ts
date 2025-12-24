@@ -17,14 +17,6 @@ import { Ignitor } from '@adonisjs/core/build/standalone'
 
 sourceMapSupport.install({ handleUncaughtExceptions: false })
 
-// Handle environment for Vercel
-if (process.env.NODE_ENV === 'production') {
-  process.env.HOST = process.env.HOST || '0.0.0.0'
-  process.env.PORT = process.env.PORT || '3000'
-}
-
-const ignitor = new Ignitor(__dirname)
-
-if (require.main === module) {
-  ignitor.httpServer().start()
-}
+new Ignitor(__dirname)
+  .httpServer()
+  .start()
