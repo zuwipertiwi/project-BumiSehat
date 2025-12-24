@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edukasi - BumiSehat 🌿</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #e0f2f1, #a5d6a7); }
+    .card-hover { transition: all 0.3s ease; }
+    .card-hover:hover { transform: translateY(-8px); box-shadow: 0 25px 50px rgba(0,0,0,0.15); }
+    .animate-fade-in { animation: fadeIn 0.8s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .article-preview { 
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- Navbar -->
+  <nav class="bg-green-600 text-white px-6 py-4 shadow-lg sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+          <span class="text-green-600 text-2xl">🌱</span>
+        </div>
+        <h1 class="text-2xl font-bold">BumiSehat</h1>
+      </div>
+      <div class="flex items-center space-x-6">
+        <a href="/dashboard" class="hover:bg-green-500 px-4 py-2 rounded-lg">Dashboard</a>
+        <a href="/aktivitas" class="hover:bg-green-500 px-4 py-2 rounded-lg">Aktivitas</a>
+        <a href="/tips" class="hover:bg-green-500 px-4 py-2 rounded-lg">Tips</a>
+        <a href="/edukasi" class="bg-green-500 px-4 py-2 rounded-lg">Edukasi</a>
+        <a href="/profil" class="hover:bg-green-500 px-4 py-2 rounded-lg">Profil</a>
+        <a href="/logout" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Header -->
+  <section class="py-8">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="bg-green-500 px-8 py-8 text-white rounded-3xl shadow-lg animate-fade-in">
+        <h1 class="text-3xl font-bold mb-2">📚 Pusat Edukasi Lingkungan</h1>
+        <p class="text-lg">Pelajari cara melestarikan bumi dengan artikel-artikel edukatif pilihan</p>
+        <div class="flex items-center mt-4 text-sm opacity-90">
+          <span class="mr-4">📖 Artikel Terbaru</span>
+          <span class="mr-4">🌍 Tips Global</span>
+          <span>🔬 Penelitian Terkini</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Search & Filter -->
+  <section class="max-w-7xl mx-auto px-6 mb-8">
+    <div class="bg-white rounded-3xl shadow-xl p-8 animate-fade-in">
+      <div class="flex flex-col lg:flex-row gap-6 items-center">
+        <div class="flex-1 relative">
+          <input type="text" placeholder="Cari artikel edukasi..." 
+                 class="w-full px-6 py-4 rounded-2xl border-2 border-gray-200 focus:border-green-500 focus:outline-none text-lg">
+          <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-2xl">🔍</span>
+        </div>
+        <div class="flex gap-3 flex-wrap">
+          <button class="bg-green-500 text-white px-6 py-3 rounded-2xl font-semibold hover:bg-green-600 transition">Semua</button>
+          <button class="bg-gray-100 text-gray-700 px-6 py-3 rounded-2xl font-semibold hover:bg-gray-200 transition">Penanaman</button>
+          <button class="bg-gray-100 text-gray-700 px-6 py-3 rounded-2xl font-semibold hover:bg-gray-200 transition">Daur Ulang</button>
+          <button class="bg-gray-100 text-gray-700 px-6 py-3 rounded-2xl font-semibold hover:bg-gray-200 transition">Kompos</button>
+          <button class="bg-gray-100 text-gray-700 px-6 py-3 rounded-2xl font-semibold hover:bg-gray-200 transition">Energi</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Article -->
+  <section class="max-w-7xl mx-auto px-6 mb-8">
+    <div class="bg-gradient-to-r from-green-600 to-blue-600 rounded-3xl shadow-xl overflow-hidden card-hover animate-fade-in cursor-pointer" onclick="window.location.href='/edukasi/1'">
+      <div class="flex flex-col lg:flex-row">
+        <div class="lg:w-1/2 p-8 lg:p-12 text-white">
+          <span class="bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-sm font-bold mb-4 inline-block">ARTIKEL UNGGULAN</span>
+          <h2 class="text-3xl lg:text-4xl font-bold mb-4">Revolusi Hijau: Cara Sederhana Menyelamatkan Planet</h2>
+          <p class="text-lg mb-6 opacity-90">Pelajari 10 langkah mudah yang bisa dilakukan setiap hari untuk memberikan dampak positif bagi lingkungan. Dari kebiasaan kecil hingga perubahan besar!</p>
+          <div class="flex items-center text-sm opacity-80">
+            <span class="mr-6">👤 Dr. Sari Lingkungan</span>
+            <span class="mr-6">📅 25 Mei 2025</span>
+            <span>⏱️ 8 menit baca</span>
+          </div>
+        </div>
+        <div class="lg:w-1/2 bg-cover bg-center min-h-64 lg:min-h-96" style="background-image: linear-gradient(45deg, rgba(34,197,94,0.8), rgba(59,130,246,0.8)), url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2250%22>🌍</text></svg>')">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Articles Grid -->
+  <section class="max-w-7xl mx-auto px-6 pb-12">
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold text-gray-800 mb-2">Artikel Terbaru</h2>
+      <p class="text-gray-600">Temukan wawasan baru tentang pelestarian lingkungan</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      
+      <!-- Article 1 -->
+      <div class="bg-white rounded-3xl shadow-xl overflow-hidden card-hover animate-fade-in cursor-pointer" onclick="window.location.href='/edukasi/2'">
+        <div class="h-48 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
+          <span class="text-6xl">🌱</span>
+        </div>
+        <div class="p-6">
+          <div class="flex items-center mb-3">
+            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">PENANAMAN</span>
+            <span class="ml-auto text-gray-500 text-sm">22 Mei 2025</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-3">Panduan Lengkap Menanam Pohon di Rumah</h3>
+          <p class="text-gray-600 text-sm mb-4">Belajar cara memilih bibit, menyiapkan tanah, dan merawat pohon agar tumbuh sehat dan memberikan manfaat maksimal...</p>
+          <div class="flex items-center justify-between text-sm text-gray-500">
+            <span>👤 Ahmad Hijau</span>
+            <span>⏱️ 6 menit baca</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Article 2 -->
+      <div class="bg-white rounded-3xl shadow-xl overflow-hidden card-hover animate-fade-in cursor-pointer" onclick="window.location.href='/edukasi/3'">
+        <div class="h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
+          <span class="text-6xl">♻️</span>
+        </div>
+        <div class="p-6">
+          <div class="flex items-center mb-3">
+            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-bold">DAUR ULANG</span>
+            <span class="ml-auto text-gray-500 text-sm">20 Mei 2025</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-3">Kreasi Unik dari Sampah Plastik</h3>
+          <p class="text-gray-600 text-sm mb-4">Ubah sampah plastik menjadi barang berguna dengan tutorial step-by-step yang mudah diikuti di rumah...</p>
+          <div class="flex items-center justify-between text-sm text-gray-500">
+            <span>👤 Lisa Kreatif</span>
+            <span>⏱️ 5 menit baca</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Article 3 -->
+      <div class="bg-white rounded-3xl shadow-xl overflow-hidden card-hover animate-fade-in cursor-pointer" onclick="window.location.href='/edukasi/4'">
+        <div class="h-48 bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
+          <span class="text-6xl">🍃</span>
+        </div>
+        <div class="p-6">
+          <div class="flex items-center mb-3">
+            <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-bold">KOMPOS</span>
+            <span class="ml-auto text-gray-500 text-sm">18 Mei 2025</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-3">Membuat Kompos dari Sampah Dapur</h3>
+          <p class="text-gray-600 text-sm mb-4">Cara mudah mengubah sisa makanan menjadi pupuk organik berkualitas tinggi untuk tanaman Anda...</p>
+          <div class="flex items-center justify-between text-sm text-gray-500">
+            <span>👤 Budi Organik</span>
+            <span>⏱️ 7 menit baca</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Article 4 -->
+      <div class="bg-white rounded-3xl shadow-xl overflow-hidden card-hover animate-fade-in cursor-pointer" onclick="window.location.href='/edukasi/5'">
+        <div class="h-48 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
+          <span class="text-6xl">💡</span>
+        </div>
+        <div class="p-6">
+          <div class="flex items-center mb-3">
+            <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-xs font-bold">ENERGI</span>
+            <span class="ml-auto text-gray-500 text-sm">15 Mei 2025</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-3">Hemat Listrik dengan Teknologi Smart Home</h3>
+          <p class="text-gray-600 text-sm mb-4">Implementasi teknologi pintar untuk mengoptimalkan penggunaan energi di rumah dan mengurangi tagihan listrik...</p>
+          <div class="flex items-center justify-between text-sm text-gray-500">
+            <span>👤 Rina Teknologi</span>
+            <span>⏱️ 9 menit baca</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Article 5 -->
+      <div class="bg-white rounded-3xl shadow-xl overflow-hidden card-hover animate-fade-in cursor-pointer" onclick="window.location.href='/edukasi/6'">
+        <div class="h-48 bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center">
+          <span class="text-6xl">🌊</span>
+        </div>
+        <div class="p-6">
+          <div class="flex items-center mb-3">
+            <span class="bg-teal-100 text-teal-800 px-3 py-1 rounded-full text-xs font-bold">AIR</span>
+            <span class="ml-auto text-gray-500 text-sm">12 Mei 2025</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-3">Konservasi Air untuk Masa Depan</h3>
+          <p class="text-gray-600 text-sm mb-4">Strategi efektif menghemat air di rumah tangga dan dampaknya terhadap keberlanjutan sumber daya air...</p>
+          <div class="flex items-center justify-between text-sm text-gray-500">
+            <span>👤 Maya Konservasi</span>
+            <span>⏱️ 6 menit baca</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Article 6 -->
+      <div class="bg-white rounded-3xl shadow-xl overflow-hidden card-hover animate-fade-in cursor-pointer" onclick="window.location.href='/edukasi/7'">
+        <div class="h-48 bg-gradient-to-br from-red-400 to-pink-500 flex items-center justify-center">
+          <span class="text-6xl">🌸</span>
+        </div>
+        <div class="p-6">
+          <div class="flex items-center mb-3">
+            <span class="bg-pink-100 text-pink-800 px-3 py-1 rounded-full text-xs font-bold">BIODIVERSITAS</span>
+            <span class="ml-auto text-gray-500 text-sm">10 Mei 2025</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-3">Melindungi Keanekaragaman Hayati Lokal</h3>
+          <p class="text-gray-600 text-sm mb-4">Pentingnya melestarikan flora dan fauna di sekitar kita serta langkah konkret yang bisa dilakukan...</p>
+          <div class="flex items-center justify-between text-sm text-gray-500">
+            <span>👤 Doni Alam</span>
+            <span>⏱️ 8 menit baca</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-green-600 text-white text-center py-4">
+    <p>&copy; 2025 BumiSehat. Semua hak dilindungi.</p>
+  </footer>
+
+  <script>
+    // Filter functionality
+    const filterButtons = document.querySelectorAll('button[class*="bg-gray-100"], button[class*="bg-green-500"]');
+    filterButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        // Remove active class from all buttons
+        filterButtons.forEach(btn => {
+          btn.className = btn.className.replace('bg-green-500 text-white', 'bg-gray-100 text-gray-700');
+        });
+        
+        // Add active class to clicked button
+        this.className = this.className.replace('bg-gray-100 text-gray-700', 'bg-green-500 text-white');
+      });
+    });
+
+    // Search functionality
+    const searchInput = document.querySelector('input[type="text"]');
+    searchInput.addEventListener('input', function() {
+      // Implement search logic here
+      console.log('Searching for:', this.value);
+    });
+
+    // Animation on scroll
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+
+    // Observe all cards
+    document.querySelectorAll('.card-hover').forEach(card => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(30px)';
+      card.style.transition = 'all 0.6s ease';
+      observer.observe(card);
+    });
+  </script>
+
+</body>
+</html>
