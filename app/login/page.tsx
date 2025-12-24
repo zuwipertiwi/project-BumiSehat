@@ -21,35 +21,51 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (!formData.email.trim()) {
+      setMessage('❌ Email tidak boleh kosong')
+      return
+    }
+    
+    if (!formData.password) {
+      setMessage('❌ Password tidak boleh kosong')
+      return
+    }
+
     setLoading(true)
     setMessage('')
 
     try {
+      console.log('📤 Sending login request...')
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: formData.email,
+          email: formData.email.trim(),
           password: formData.password,
         }),
       })
 
       const data = await response.json()
+      console.log('📥 Login response:', { status: response.status, data })
 
-      if (response.ok) {
-        setMessage('✅ Login berhasil! Mengalihkan...')
-        // Simpan token dan redirect
+      if (response.ok && data.success && data.token) {
+        setMessage('✅ Login berhasil! Mengalihkan ke dashboard...')
+        // Simpan token
         localStorage.setItem('token', data.token)
+        localStorage.setItem('user', JSON.stringify(data.user))
+        
         setTimeout(() => {
           window.location.href = '/dashboard'
         }, 1500)
       } else {
         setMessage(`❌ ${data.message || 'Login gagal'}`)
       }
-    } catch (error) {
-      setMessage('❌ Terjadi kesalahan. Silakan coba lagi.')
+    } catch (error: any) {
+      console.error('❌ Login error:', error)
+      setMessage('❌ Terjadi kesalahan koneksi. Silakan coba lagi.')
     } finally {
       setLoading(false)
     }

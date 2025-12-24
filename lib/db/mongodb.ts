@@ -14,24 +14,37 @@ if (!cached.mongo) {
 
 async function connectDB() {
   if (cached.mongo.conn) {
+    console.log('♻️ Using cached MongoDB connection')
     return cached.mongo.conn
   }
 
   if (!cached.mongo.promise) {
     const opts = {
       bufferCommands: false,
+      connectTimeoutMS: 10000,
+      socketTimeoutMS: 45000,
     }
 
+    console.log('🔌 Initiating new MongoDB connection...')
+    console.log('📍 Connection URI:', MONGODB_URI.replace(/:[^:]*@/, ':****@'))
+    
     cached.mongo.promise = mongoose
       .connect(MONGODB_URI, opts)
       .then((mongoose) => {
+        console.log('✅ MongoDB connected successfully')
         return mongoose
+      })
+      .catch((error) => {
+        console.error('❌ MongoDB connection failed:', error.message)
+        cached.mongo.promise = null
+        throw error
       })
   }
 
   try {
     cached.mongo.conn = await cached.mongo.promise
-  } catch (e) {
+  } catch (e: any) {
+    console.error('❌ MongoDB connection error:', e.message)
     cached.mongo.promise = null
     throw e
   }

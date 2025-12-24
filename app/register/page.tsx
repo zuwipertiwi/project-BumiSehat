@@ -24,8 +24,24 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
+    // Validasi form
+    if (!formData.name.trim()) {
+      setMessage('❌ Nama tidak boleh kosong')
+      return
+    }
+    
+    if (!formData.email.trim()) {
+      setMessage('❌ Email tidak boleh kosong')
+      return
+    }
+
+    if (formData.password.length < 6) {
+      setMessage('❌ Password minimal 6 karakter')
+      return
+    }
+    
     if (formData.password !== formData.confirmPassword) {
-      setMessage('Password tidak cocok!')
+      setMessage('❌ Password tidak cocok!')
       return
     }
 
@@ -33,22 +49,24 @@ export default function Register() {
     setMessage('')
 
     try {
+      console.log('📤 Sending register request...')
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
+          name: formData.name.trim(),
+          email: formData.email.trim(),
           password: formData.password,
         }),
       })
 
       const data = await response.json()
+      console.log('📥 Register response:', { status: response.status, data })
 
-      if (response.ok) {
-        setMessage('✅ Registrasi berhasil! Silakan login.')
+      if (response.ok && data.success) {
+        setMessage('✅ Registrasi berhasil! Mengalihkan ke login...')
         setFormData({ name: '', email: '', password: '', confirmPassword: '' })
         // Redirect ke login setelah 2 detik
         setTimeout(() => {
@@ -57,8 +75,9 @@ export default function Register() {
       } else {
         setMessage(`❌ ${data.message || 'Registrasi gagal'}`)
       }
-    } catch (error) {
-      setMessage('❌ Terjadi kesalahan. Silakan coba lagi.')
+    } catch (error: any) {
+      console.error('❌ Register error:', error)
+      setMessage('❌ Terjadi kesalahan koneksi. Silakan coba lagi.')
     } finally {
       setLoading(false)
     }
