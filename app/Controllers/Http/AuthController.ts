@@ -59,6 +59,11 @@ export default class AuthController {
     }
 
     return response.redirect('/dashboard')
+    } catch (error) {
+      console.error('Login error:', error)
+      session.flash('error', 'Terjadi kesalahan saat login')
+      return response.redirect().back()
+    }
   }
 
   public async showRegister({ view }: HttpContextContract) {

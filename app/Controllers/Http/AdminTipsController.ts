@@ -2,7 +2,6 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import Tips from 'App/Models/Tips'
 import KategoriTips from 'App/Models/KategoriTips'
-import { Application } from '@adonisjs/core/build/standalone'
 import path from 'path'
 import fs from 'fs'
 
@@ -77,7 +76,7 @@ export default class AdminTipsController {
         },
       })
 
-      let gambarPath = null
+      let gambarPath: string | null = null
 
       // ✅ Upload gambar jika ada
       if (payload.gambar) {
@@ -94,7 +93,7 @@ export default class AdminTipsController {
           overwrite: true,
         })
 
-        gambarPath = `/uploads/${fileName}`
+        gambarPath = `/uploads/${fileName}` as string
       }
 
       // ✅ Dapatkan kategori berdasarkan kategori_id
@@ -244,7 +243,7 @@ export default class AdminTipsController {
         },
       })
 
-      let gambarPath = tip.gambar
+      let gambarPath: string | null = (tip.gambar as string | null) || null
 
       // Handle new image upload if present
       if (payload.gambar) {
@@ -262,7 +261,7 @@ export default class AdminTipsController {
           name: fileName,
           overwrite: true,
         })
-        gambarPath = `/uploads/${fileName}`
+        gambarPath = `/uploads/${fileName}` as string
       }
 
       // Update tip

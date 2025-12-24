@@ -20,7 +20,7 @@ export default class ProfilController {
         tanggal_lahir: user.tanggal_lahir || null,
         jenis_kelamin: user.jenis_kelamin || '-',
         bio: user.bio || 'Belum ada bio',
-        joinDate: user.createdAt,
+        joinDate: new Date(),
         profil_publik: user.profil_publik,
         share_aktivitas: user.share_aktivitas,
         notifikasi_email: user.notifikasi_email
@@ -54,7 +54,7 @@ export default class ProfilController {
 
     } catch (error) {
       console.error('Profil Controller Error:', error)
-      return response.redirect('/dashboard').with('error', 'Terjadi kesalahan saat memuat profil')
+      return response.redirect('/dashboard')
     }
   }
 
@@ -81,7 +81,7 @@ export default class ProfilController {
 
     } catch (error) {
       console.error('Show Edit Profil Error:', error)
-      return response.redirect('/profil').with('error', 'Terjadi kesalahan')
+      return response.redirect('/profil')
     }
   }
 

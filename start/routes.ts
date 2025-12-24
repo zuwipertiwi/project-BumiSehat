@@ -9,11 +9,11 @@
 */
 
 import Route from '@ioc:Adonis/Core/Route'
-import AuthController from 'App/Controllers/Http/AuthController'
-import ProfilController from 'App/Controllers/Http/ProfilController'
+// import AuthController from 'App/Controllers/Http/AuthController'
+// import ProfilController from 'App/Controllers/Http/ProfilController'
 import Aktivitas from 'App/Models/Aktivitas'
 import Kategori from 'App/Models/Kategori'
-import KategoriTips from 'App/Models/KategoriTips'
+// import KategoriTips from 'App/Models/KategoriTips'
 import Tips from 'App/Models/Tips'
 import User from 'App/Models/User'
 import { DateTime } from 'luxon'
@@ -40,14 +40,14 @@ Route.get('/register', 'AuthController.showRegister')
 Route.post('/login', 'AuthController.login')
 Route.post('/register', 'AuthController.register')
 
-const kategoris = [
-  { nama: 'Penanaman', icon: '🌳' },
-  { nama: 'Pengelolaan Sampah', icon: '♻️' },
-  { nama: 'Konservasi Air', icon: '💧' },
-  { nama: 'Reduce Waste', icon: '🗑️' },
-  { nama: 'Edukasi Lingkungan', icon: '📚' },
-  { nama: 'Lainnya', icon: '🌱' }
-]
+// const kategoris = [
+  // { nama: 'Penanaman', icon: '🌳' },
+  // { nama: 'Pengelolaan Sampah', icon: '♻️' },
+  // { nama: 'Konservasi Air', icon: '💧' },
+  // { nama: 'Reduce Waste', icon: '🗑️' },
+  // { nama: 'Edukasi Lingkungan', icon: '📚' },
+  // { nama: 'Lainnya', icon: '🌱' }
+// ]
 
 
 Route.group(() => {
@@ -79,9 +79,9 @@ Route.group(() => {
       .limit(5)
 
     // Hitung aktivitas bulan ini untuk progress
-    const bulanIni = DateTime.now().toFormat('yyyy-LL')
+    // const bulanIni = DateTime.now().toFormat('yyyy-LL')
     const awalBulan = DateTime.now().startOf('month').toJSDate()
-const akhirBulan = DateTime.now().endOf('month').toJSDate()
+    const akhirBulan = DateTime.now().endOf('month').toJSDate()
     const aktivitasBulanIni = await Aktivitas
       .where('user_id', user._id)
       .where('tanggal', { $gte: awalBulan, $lte: akhirBulan })
@@ -320,8 +320,8 @@ Route.get('/tips', async ({ view }) => {
     } : null
 
     // Group tips by category
-    const tipsByCategory = tips.reduce((acc, tip) => {
-      const categoryName = tip.kategori?.nama || 'Lainnya'
+    const tipsByCategory = tips.reduce((acc: Record<string, any>, tip: any) => {
+      const categoryName = (tip.kategori as any)?.nama || 'Lainnya'
 
       if (!acc[categoryName]) {
         acc[categoryName] = []
@@ -610,11 +610,11 @@ Route.group(() => {
         .sort({ createdAt: -1 })
         .limit(3)
         .lean()
-        .then(activities => activities.map(act => ({
-          username: act.user_id?.name || 'Unknown',
+        .then(activities => activities.map((act: any) => ({
+          username: (act.user_id as any)?.name || 'Unknown',
           aktivitas: act.deskripsi,
           tanggal: new Date(act.createdAt).toLocaleDateString('id-ID'),
-          kategori: act.kategori_id?.nama || 'Uncategorized',
+          kategori: (act.kategori_id as any)?.nama || 'Uncategorized',
           status: act.status
         })))
 
@@ -661,14 +661,14 @@ Route.group(() => {
         .populate('kategori_id', 'nama icon')
         .sort({ createdAt: -1 })
         .lean()
-        .then(activities => activities.map(act => ({
+        .then(activities => activities.map((act: any) => ({
           id: act._id,
-          username: act.user_id?.name || 'Unknown',
-          email: act.user_id?.email || '-',
+          username: (act.user_id as any)?.name || 'Unknown',
+          email: (act.user_id as any)?.email || '-',
           aktivitas: act.deskripsi,
-          tanggal: new Date(act.tanggal).toLocaleDateString('id-ID'),
-          kategori: act.kategori_id?.nama || 'Uncategorized',
-          icon: act.kategori_id?.icon || '🌱',
+          tanggal: act.tanggal ? new Date(act.tanggal).toLocaleDateString('id-ID') : '-',
+          kategori: (act.kategori_id as any)?.nama || 'Uncategorized',
+          icon: (act.kategori_id as any)?.icon || '🌱',
           deskripsi: act.deskripsi,
           lokasi: act.lokasi || '-',
           status: act.status,

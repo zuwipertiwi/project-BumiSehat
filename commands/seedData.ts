@@ -1,7 +1,7 @@
 import { BaseCommand } from '@adonisjs/core/build/standalone'
 import User from '../app/Models/User'
 import Kategori from '../app/Models/Kategori'
-import mongoose from 'mongoose'
+// import mongoose from 'mongoose'
 import KategoriTips from '../app/Models/KategoriTips'
 
 export default class SeedData extends BaseCommand {

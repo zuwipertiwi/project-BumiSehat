@@ -91,7 +91,7 @@ UserSchema.methods.calculateStreak = async function() {
   currentDate.setHours(0, 0, 0, 0)
 
   for (let i = 0; i < aktivitas.length; i++) {
-    const aktDate = new Date(aktivitas[i].tanggal)
+    const aktDate = aktivitas[i].tanggal ? new Date(String(aktivitas[i].tanggal)) : new Date()
     aktDate.setHours(0, 0, 0, 0)
 
     const diffDays = Math.floor((currentDate.getTime() - aktDate.getTime()) / (1000 * 60 * 60 * 24))

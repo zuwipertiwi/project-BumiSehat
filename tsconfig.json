@@ -27,6 +27,7 @@
       ],
       "Models/*": ["./app/Models/*"]
     },
+    "skipLibCheck": true,
     "types": [
       "@adonisjs/core",
       "@adonisjs/repl",

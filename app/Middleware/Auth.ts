@@ -1,6 +1,4 @@
-import type { GuardsList } from '@ioc:Adonis/Addons/Auth'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import type { AuthenticationException } from '@adonisjs/auth/build/standalone'
 
 import jwt from 'jsonwebtoken'
 import Env from '@ioc:Adonis/Core/Env'

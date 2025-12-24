@@ -79,8 +79,8 @@ export default class AktivitasController {
       // Sort by type jika diperlukan
       if (sort === 'type') {
         aktivitas = aktivitas.sort((a, b) => {
-          const nameA = a.kategori_id?.nama || ''
-          const nameB = b.kategori_id?.nama || ''
+          const nameA = (a.kategori_id as any)?.nama || ''
+          const nameB = (b.kategori_id as any)?.nama || ''
           return nameA.localeCompare(nameB)
         })
       }
@@ -134,11 +134,11 @@ export default class AktivitasController {
       const kategori_id = Category._id
 
       // Validasi input
-      const missingFields = [];
-      if (!kategori_id) missingFields.push('kategori_id');
-      if (!tanggal) missingFields.push('tanggal');
-      if (!deskripsi) missingFields.push('deskripsi');
-      if (!manfaat) missingFields.push('manfaat');
+      const missingFields: string[] = []
+      if (!kategori_id) missingFields.push('kategori_id')
+      if (!tanggal) missingFields.push('tanggal')
+      if (!deskripsi) missingFields.push('deskripsi')
+      if (!manfaat) missingFields.push('manfaat')
 
       if (missingFields.length > 0) {
         return response.status(400).json({
