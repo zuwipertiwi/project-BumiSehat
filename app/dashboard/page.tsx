@@ -2,17 +2,46 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function Dashboard() {
   const [user, setUser] = useState<any>(null)
+  const router = useRouter()
 
   useEffect(() => {
-    // Cek user dari localStorage atau API
+    // Cek token dan user dari localStorage
     const token = localStorage.getItem('token')
+    const userData = localStorage.getItem('user')
+    
     if (!token) {
-      window.location.href = '/login'
+      router.push('/login')
+      return
+    }
+
+    if (userData) {
+      try {
+        setUser(JSON.parse(userData))
+      } catch (e) {
+        console.error('Error parsing user data:', e)
+      }
     }
   }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    router.push('/')
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50">
@@ -26,11 +55,11 @@ export default function Dashboard() {
             <span className="text-xl font-bold text-emerald-700">BumiSehat</span>
           </div>
           <div className="flex items-center space-x-4">
+            <Link href="/profil" className="text-gray-700 hover:text-emerald-600 font-medium">
+              👤 {user?.name || 'User'}
+            </Link>
             <button
-              onClick={() => {
-                localStorage.removeItem('token')
-                window.location.href = '/'
-              }}
+              onClick={handleLogout}
               className="text-red-600 hover:text-red-700 font-semibold"
             >
               Logout
@@ -44,7 +73,7 @@ export default function Dashboard() {
         {/* Header */}
         <div className="mb-12">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">Selamat Datang di Dashboard 👋</h1>
-          <p className="text-gray-600 text-lg">Kelola aktivitas ramah lingkunganmu dan track dampak positifmu</p>
+          <p className="text-gray-600 text-lg">Halo {user?.name || 'Pengguna'}! Kelola aktivitas ramah lingkunganmu dan track dampak positifmu</p>
         </div>
 
         {/* Quick Stats */}
