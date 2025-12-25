@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     // Cari user berdasarkan email
     console.log('🔍 Finding user by email:', emailLower)
     const user = await User.findOne({ email: emailLower })
-    
+
     if (!user) {
       console.warn('⚠️ User not found:', emailLower)
       return NextResponse.json(
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     // Verifikasi password menggunakan method dari model
     console.log('🔐 Verifying password...')
     const isPasswordValid = await user.comparePassword(password)
-    
+
     if (!isPasswordValid) {
       console.warn('⚠️ Password mismatch for user:', emailLower)
       return NextResponse.json(
@@ -77,7 +77,9 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('✅ Login successful for:', emailLower)
-    return NextResponse.json(
+
+    // Buat response dengan token di cookies
+    const response = NextResponse.json(
       {
         success: true,
         message: 'Login berhasil!',
@@ -86,12 +88,23 @@ export async function POST(request: NextRequest) {
       },
       { status: 200 }
     )
+
+    // Set token di cookies untuk middleware
+    response.cookies.set('token', token, {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60, // 7 hari
+      path: '/',
+    })
+
+    return response
   } catch (error: any) {
     console.error('❌ Login error:', error.message || error)
     console.error('Stack:', error.stack)
-    
+
     return NextResponse.json(
-      { 
+      {
         success: false,
         message: error.message || 'Terjadi kesalahan saat login. Silakan coba lagi.',
         error: process.env.NODE_ENV === 'development' ? error.message : undefined

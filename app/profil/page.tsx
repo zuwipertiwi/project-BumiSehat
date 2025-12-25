@@ -1,18 +1,44 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { getUser } from '@/lib/auth'
 
 export default function Profil() {
-  const [user, setUser] = useState({
-    name: 'Nama Pengguna',
-    email: 'user@example.com',
-    location: 'Jakarta, Indonesia',
-    bio: 'Pecinta lingkungan dan aktivis keberlanjutan',
-    avatar: '👤'
-  })
-
+  const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
+  const [aktivitasCount, setAktivitasCount] = useState(0)
+  const router = useRouter()
+
+  useEffect(() => {
+    // Get user data
+    const userData = getUser()
+    if (!userData) {
+      router.push('/login')
+      return
+    }
+
+    setUser(userData)
+
+    // Fetch aktivitas count
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/aktivitas')
+        const data = await response.json()
+        if (data.success) {
+          setAktivitasCount(data.data.length)
+        }
+      } catch (error) {
+        console.error('Error fetching aktivitas:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [router])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50">
@@ -39,16 +65,16 @@ export default function Profil() {
             {/* Avatar */}
             <div className="text-center md:text-left">
               <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center mx-auto md:mx-0 mb-4">
-                <span className="text-5xl">{user.avatar}</span>
+                <span className="text-5xl">👤</span>
               </div>
             </div>
 
             {/* Info */}
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">{user.name}</h1>
-              <p className="text-gray-600 mb-2">📧 {user.email}</p>
-              <p className="text-gray-600 mb-2">📍 {user.location}</p>
-              <p className="text-gray-700 mb-6">{user.bio}</p>
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">{user?.name || 'Loading...'}</h1>
+              <p className="text-gray-600 mb-2">📧 {user?.email || 'Loading...'}</p>
+              <p className="text-gray-600 mb-2">📍 {user?.lokasi || 'Belum diisi'}</p>
+              <p className="text-gray-700 mb-6">{user?.bio || 'Pecinta lingkungan dan aktivis keberlanjutan'}</p>
               <button
                 onClick={() => setIsEditing(!isEditing)}
                 className="bg-emerald-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-emerald-700"
@@ -66,7 +92,7 @@ export default function Profil() {
             <p className="text-gray-600 font-medium">Poin Keberlanjutan</p>
           </div>
           <div className="bg-white rounded-2xl shadow-md p-6 text-center">
-            <div className="text-4xl font-bold text-blue-600 mb-2">24</div>
+            <div className="text-4xl font-bold text-blue-600 mb-2">{aktivitasCount}</div>
             <p className="text-gray-600 font-medium">Aktivitas Tercatat</p>
           </div>
           <div className="bg-white rounded-2xl shadow-md p-6 text-center">

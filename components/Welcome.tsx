@@ -9,61 +9,61 @@ export default function Welcome() {
         body {
           font-family: 'Poppins', sans-serif;
         }
-        
+
         .hero-gradient {
           background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 25%, #064e3b 50%, #059669 75%, #34d399 100%);
           background-size: 200% 200%;
           animation: gradientShift 20s ease infinite;
         }
-        
+
         @keyframes gradientShift {
           0% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
           100% { background-position: 0% 50%; }
         }
-        
+
         .floating {
           animation: floating 4s ease-in-out infinite;
         }
-        
+
         @keyframes floating {
           0%, 100% { transform: translateY(0px) rotate(0deg); }
           25% { transform: translateY(-15px) rotate(5deg); }
           50% { transform: translateY(-20px) rotate(0deg); }
           75% { transform: translateY(-10px) rotate(-5deg); }
         }
-        
+
         .fade-in-up {
           animation: fadeInUp 1.2s ease-out forwards;
           opacity: 0;
           transform: translateY(40px);
         }
-        
+
         .fade-in-up-delay {
           animation: fadeInUp 1.2s ease-out 0.3s forwards;
           opacity: 0;
           transform: translateY(40px);
         }
-        
+
         .fade-in-up-delay-2 {
           animation: fadeInUp 1.2s ease-out 0.6s forwards;
           opacity: 0;
           transform: translateY(40px);
         }
-        
+
         .fade-in-up-delay-3 {
           animation: fadeInUp 1.2s ease-out 0.9s forwards;
           opacity: 0;
           transform: translateY(40px);
         }
-        
+
         @keyframes fadeInUp {
           to {
             opacity: 1;
             transform: translateY(0);
           }
         }
-        
+
         .glow-button {
           background: linear-gradient(45deg, #059669, #10b981, #34d399);
           background-size: 200% 200%;
@@ -73,24 +73,24 @@ export default function Welcome() {
           overflow: hidden;
           animation: gradientPulse 3s ease infinite;
         }
-        
+
         @keyframes gradientPulse {
           0%, 100% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
         }
-        
+
         .glow-button:hover {
           transform: translateY(-5px) scale(1.05);
           box-shadow: 0 15px 40px rgba(16, 185, 129, 0.6);
         }
-        
+
         .glass-card {
           background: rgba(255, 255, 255, 0.1);
           backdrop-filter: blur(10px);
           border: 1px solid rgba(255, 255, 255, 0.2);
           border-radius: 1.5rem;
         }
-        
+
         .glass-card:hover {
           background: rgba(255, 255, 255, 0.15);
           border-color: rgba(255, 255, 255, 0.3);
@@ -168,7 +168,7 @@ export default function Welcome() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-6xl mx-auto fade-in-up-delay-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto fade-in-up-delay-3">
             <div className="glass-card rounded-3xl p-8 text-center">
               <div className="text-5xl font-bold mb-3 text-white">1,250+</div>
               <div className="text-white/95 font-semibold text-lg mb-1">Eco Warriors</div>
@@ -183,11 +183,6 @@ export default function Welcome() {
               <div className="text-5xl font-bold mb-3 text-white">3,200+</div>
               <div className="text-white/95 font-semibold text-lg mb-1">Pohon Ditanam</div>
               <div className="text-white/70 text-sm">Kontribusi penghijauan</div>
-            </div>
-            <div className="glass-card rounded-3xl p-8 text-center">
-              <div className="text-5xl font-bold mb-3 text-white">150+</div>
-              <div className="text-white/95 font-semibold text-lg mb-1">Tips Konservasi</div>
-              <div className="text-white/70 text-sm">Panduan edukatif tersedia</div>
             </div>
           </div>
         </div>

@@ -3,41 +3,104 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { getUser, getAuthToken, clearAuth } from '@/lib/auth'
+
+interface Aktivitas {
+  _id: string
+  judul: string
+  deskripsi: string
+  createdAt: string
+}
 
 export default function Dashboard() {
   const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [aktivitasCount, setAktivitasCount] = useState(0)
+  const [pohonDitanam, setPohonDitanam] = useState(0)
+  const [recentAktivitas, setRecentAktivitas] = useState<Aktivitas[]>([])
   const router = useRouter()
 
   useEffect(() => {
     // Cek token dan user dari localStorage
-    const token = localStorage.getItem('token')
-    const userData = localStorage.getItem('user')
-    
-    if (!token) {
+    const token = getAuthToken()
+    const userData = getUser()
+
+    if (!token || !userData) {
+      console.log('No token or user data found, redirecting to login')
       router.push('/login')
       return
     }
 
-    if (userData) {
+    setUser(userData)
+
+    // Fetch aktivitas dan tips data
+    const fetchData = async () => {
       try {
-        setUser(JSON.parse(userData))
-      } catch (e) {
-        console.error('Error parsing user data:', e)
+        console.log('📥 Fetching dashboard data...')
+
+        // Fetch aktivitas
+        const aktivitasResponse = await fetch('/api/aktivitas')
+        const aktivitasData = await aktivitasResponse.json()
+
+        if (aktivitasData.success) {
+          console.log('✅ Aktivitas fetched:', aktivitasData.data.length)
+          setAktivitasCount(aktivitasData.data.length)
+
+          // Calculate total pohon ditanam
+          const totalPohon = aktivitasData.data.reduce((sum: number, a: any) => {
+            return sum + (a.pohon_ditanam || 0)
+          }, 0)
+          setPohonDitanam(totalPohon)
+          console.log('🌳 Total pohon ditanam:', totalPohon)
+
+          // Get last 3 aktivitas
+          const recent = aktivitasData.data.slice(0, 3)
+          setRecentAktivitas(recent)
+        }
+      } catch (error) {
+        console.error('❌ Error fetching dashboard data:', error)
+      } finally {
+        setLoading(false)
       }
     }
-  }, [])
 
-  const handleLogout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    router.push('/')
+    fetchData()
+  }, [router])
+
+  const handleLogout = async () => {
+    try {
+      // Call logout API to clear cookies
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (response.ok) {
+        clearAuth()
+        router.push('/')
+      } else {
+        // Fallback: clear localStorage anyway
+        clearAuth()
+        router.push('/')
+      }
+    } catch (error) {
+      console.error('Logout error:', error)
+      // Fallback: clear localStorage anyway
+      clearAuth()
+      router.push('/')
+    }
   }
 
-  if (!user) {
+  if (loading || !user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600">Loading...</p>
+          <div className="inline-block">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mb-4"></div>
+          </div>
+          <p className="text-gray-600">Loading dashboard...</p>
         </div>
       </div>
     )
@@ -77,17 +140,13 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           <div className="bg-white rounded-2xl shadow-md p-6">
-            <div className="text-4xl font-bold text-emerald-600 mb-2">12</div>
+            <div className="text-4xl font-bold text-emerald-600 mb-2">{aktivitasCount}</div>
             <p className="text-gray-600 font-medium">Aktivitas Tercatat</p>
           </div>
           <div className="bg-white rounded-2xl shadow-md p-6">
-            <div className="text-4xl font-bold text-blue-600 mb-2">8</div>
-            <p className="text-gray-600 font-medium">Tips Dibaca</p>
-          </div>
-          <div className="bg-white rounded-2xl shadow-md p-6">
-            <div className="text-4xl font-bold text-green-600 mb-2">24</div>
+            <div className="text-4xl font-bold text-green-700 mb-2">🌳 {pohonDitanam}</div>
             <p className="text-gray-600 font-medium">Pohon Ditanam</p>
           </div>
           <div className="bg-white rounded-2xl shadow-md p-6">
@@ -97,23 +156,13 @@ export default function Dashboard() {
         </div>
 
         {/* Features */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           {/* Aktivitas */}
           <Link href="/aktivitas">
             <div className="bg-white rounded-2xl shadow-md p-8 hover:shadow-xl transition-all cursor-pointer group">
               <div className="text-5xl mb-4">📊</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3 group-hover:text-emerald-600">Aktivitas</h3>
               <p className="text-gray-600 mb-4">Catat aktivitas ramah lingkunganmu sehari-hari</p>
-              <p className="text-emerald-600 font-semibold">Lihat Selengkapnya →</p>
-            </div>
-          </Link>
-
-          {/* Tips */}
-          <Link href="/tips">
-            <div className="bg-white rounded-2xl shadow-md p-8 hover:shadow-xl transition-all cursor-pointer group">
-              <div className="text-5xl mb-4">💡</div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3 group-hover:text-emerald-600">Tips Konservasi</h3>
-              <p className="text-gray-600 mb-4">Pelajari tips dan trik untuk menjaga lingkungan</p>
               <p className="text-emerald-600 font-semibold">Lihat Selengkapnya →</p>
             </div>
           </Link>
@@ -132,20 +181,30 @@ export default function Dashboard() {
         {/* Recent Activities */}
         <div className="bg-white rounded-2xl shadow-md p-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Aktivitas Terbaru</h2>
-          <div className="space-y-4">
-            <div className="border-l-4 border-green-500 pl-4 py-3">
-              <p className="font-semibold text-gray-800">Menanam 5 pohon di taman lokal</p>
-              <p className="text-gray-600 text-sm">2 hari yang lalu</p>
+          {recentAktivitas.length > 0 ? (
+            <div className="space-y-4">
+              {recentAktivitas.map((aktivitas, index) => (
+                <div key={aktivitas._id} className="border-l-4 border-green-500 pl-4 py-3">
+                  <p className="font-semibold text-gray-800">{aktivitas.judul}</p>
+                  <p className="text-gray-600 text-sm">
+                    {new Date(aktivitas.createdAt).toLocaleDateString('id-ID', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </p>
+                </div>
+              ))}
             </div>
-            <div className="border-l-4 border-blue-500 pl-4 py-3">
-              <p className="font-semibold text-gray-800">Membaca tips: "Cara Membuat Kompos"</p>
-              <p className="text-gray-600 text-sm">5 hari yang lalu</p>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-500">Belum ada aktivitas. Mulai dengan menambahkan aktivitas Anda!</p>
+              <Link href="/aktivitas" className="text-emerald-600 font-semibold hover:text-emerald-700 mt-4 inline-block">
+                Tambah Aktivitas →
+              </Link>
             </div>
-            <div className="border-l-4 border-yellow-500 pl-4 py-3">
-              <p className="font-semibold text-gray-800">Mengurangi plastik sekali pakai</p>
-              <p className="text-gray-600 text-sm">1 minggu yang lalu</p>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

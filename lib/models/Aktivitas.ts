@@ -1,12 +1,14 @@
 import mongoose from 'mongoose'
 
 interface IAktivitas extends mongoose.Document {
-  user_id: mongoose.Schema.Types.ObjectId
-  kategori_id: mongoose.Schema.Types.ObjectId
+  userId: mongoose.Schema.Types.ObjectId
   judul: string
   deskripsi: string
-  tanggal: Date
-  lokasi: string
+  dampak?: string
+  kategori: string
+  pohon_ditanam?: number
+  tanggal?: Date
+  lokasi?: string
   foto?: string
   status: 'pending' | 'disetujui' | 'ditolak'
   catatan_reviewer?: string
@@ -16,14 +18,9 @@ interface IAktivitas extends mongoose.Document {
 
 const aktivitasSchema = new mongoose.Schema<IAktivitas>(
   {
-    user_id: {
+    userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
-    },
-    kategori_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Kategori',
       required: true,
     },
     judul: {
@@ -34,14 +31,23 @@ const aktivitasSchema = new mongoose.Schema<IAktivitas>(
       type: String,
       required: true,
     },
-    tanggal: {
-      type: Date,
-      required: true,
+    dampak: {
+      type: String,
+      default: '',
     },
-    lokasi: {
+    kategori: {
       type: String,
       required: true,
     },
+    pohon_ditanam: {
+      type: Number,
+      default: 0,
+    },
+    tanggal: {
+      type: Date,
+      default: () => new Date(),
+    },
+    lokasi: String,
     foto: String,
     status: {
       type: String,
@@ -53,4 +59,9 @@ const aktivitasSchema = new mongoose.Schema<IAktivitas>(
   { timestamps: true }
 )
 
-export default mongoose.models.Aktivitas || mongoose.model('Aktivitas', aktivitasSchema)
+// Clear model cache to avoid stale model issues in development
+if (mongoose.models.Aktivitas) {
+  delete mongoose.models.Aktivitas
+}
+
+export default mongoose.model('Aktivitas', aktivitasSchema)

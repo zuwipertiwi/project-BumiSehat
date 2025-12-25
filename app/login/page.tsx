@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { setAuthToken } from '@/lib/auth'
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -21,12 +22,12 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!formData.email.trim()) {
       setMessage('❌ Email tidak boleh kosong')
       return
     }
-    
+
     if (!formData.password) {
       setMessage('❌ Password tidak boleh kosong')
       return
@@ -53,10 +54,9 @@ export default function Login() {
 
       if (response.ok && data.success && data.token) {
         setMessage('✅ Login berhasil! Mengalihkan ke dashboard...')
-        // Simpan token
-        localStorage.setItem('token', data.token)
-        localStorage.setItem('user', JSON.stringify(data.user))
-        
+        // Simpan token menggunakan helper
+        setAuthToken(data.token, data.user)
+
         setTimeout(() => {
           window.location.href = '/dashboard'
         }, 1500)

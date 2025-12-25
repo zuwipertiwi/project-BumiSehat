@@ -50,19 +50,19 @@ export async function PUT(
 
         const formData = await request.formData()
         const judul = formData.get('judul') as string
-        const kategori_id = formData.get('kategori_id') as string
+        const kategori = formData.get('kategori') as string
         const konten = formData.get('konten') as string
-        const dampak = formData.get('dampak') as string
-        const status = formData.get('status') as string
+        const deskripsi = formData.get('deskripsi') as string
+        const penulis = formData.get('penulis') as string
         const gambar = formData.get('gambar') as File | null
 
-        let gambarPath = tip.gambar
+        let fotoPath = tip.foto
 
         // Handle new image
         if (gambar && gambar.size > 0) {
             // Delete old image
-            if (tip.gambar) {
-                const oldPath = path.join(process.cwd(), 'public', tip.gambar)
+            if (tip.foto) {
+                const oldPath = path.join(process.cwd(), 'public', tip.foto)
                 if (existsSync(oldPath)) {
                     await unlink(oldPath)
                 }
@@ -78,7 +78,7 @@ export async function PUT(
             const fileName = `${Date.now()}-${gambar.name}`
             const filePath = path.join(uploadsDir, fileName)
             await writeFile(filePath, buffer)
-            gambarPath = `/uploads/${fileName}`
+            fotoPath = `/uploads/${fileName}`
         }
 
         // Update tip
@@ -86,14 +86,14 @@ export async function PUT(
             id,
             {
                 judul: judul || tip.judul,
-                kategori: kategori_id || tip.kategori,
+                kategori: kategori || tip.kategori,
                 konten: konten || tip.konten,
-                dampak: dampak || tip.dampak,
-                status: status || tip.status,
-                gambar: gambarPath
+                deskripsi: deskripsi || tip.deskripsi,
+                penulis: penulis || tip.penulis,
+                foto: fotoPath
             },
             { new: true }
-        ).populate('kategori')
+        )
 
         return NextResponse.json({
             success: true,
@@ -127,8 +127,8 @@ export async function DELETE(
         }
 
         // Delete image if exists
-        if (tip.gambar) {
-            const imagePath = path.join(process.cwd(), 'public', tip.gambar)
+        if (tip.foto) {
+            const imagePath = path.join(process.cwd(), 'public', tip.foto)
             if (existsSync(imagePath)) {
                 await unlink(imagePath)
             }
@@ -166,12 +166,12 @@ export async function PATCH(
             )
         }
 
-        const newStatus = tip.status === 'published' ? 'draft' : 'published'
+        const newStatus = tip.views === 0 ? 1 : 0
         const updatedTip = await Tips.findByIdAndUpdate(
             id,
-            { status: newStatus },
+            { views: newStatus },
             { new: true }
-        ).populate('kategori')
+        )
 
         return NextResponse.json({
             success: true,

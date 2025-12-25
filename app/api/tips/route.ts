@@ -5,10 +5,10 @@ import Tips from '@/lib/models/Tips'
 export async function GET(request: NextRequest) {
   try {
     console.log('📥 GET /api/tips - Fetch all tips')
-    
+
     await connectDB()
     const tips = await Tips.find().sort({ createdAt: -1 })
-    
+
     console.log(`✅ Fetched ${tips.length} tips`)
     return NextResponse.json({
       success: true,
@@ -25,15 +25,15 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { judul, kategori, deskripsi, konten } = await request.json()
+    const { judul, konten, deskripsi, kategori, penulis } = await request.json()
 
     console.log('📝 POST /api/tips - Create tips:', { judul, kategori })
 
     // Validasi input
-    if (!judul || !kategori || !deskripsi || !konten) {
+    if (!judul || !konten) {
       console.warn('⚠️ Missing required fields')
       return NextResponse.json(
-        { success: false, message: 'Judul, kategori, deskripsi, dan konten harus diisi' },
+        { success: false, message: 'Judul dan konten harus diisi' },
         { status: 400 }
       )
     }
@@ -43,9 +43,10 @@ export async function POST(request: NextRequest) {
     // Create tips
     const newTips = new Tips({
       judul: judul.trim(),
-      kategori: kategori.trim(),
-      deskripsi: deskripsi.trim(),
       konten: konten.trim(),
+      deskripsi: deskripsi?.trim() || '',
+      kategori: kategori?.trim() || 'Umum',
+      penulis: penulis?.trim() || 'Admin BumiSehat',
       views: 0
     })
 
@@ -60,10 +61,10 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     )
-  } catch (error) {
-    console.error('❌ Error creating tips:', error)
+  } catch (error: any) {
+    console.error('❌ Error creating tips:', error.message || error)
     return NextResponse.json(
-      { success: false, message: 'Gagal membuat tips' },
+      { success: false, message: 'Gagal membuat tips: ' + (error.message || 'Unknown error') },
       { status: 500 }
     )
   }

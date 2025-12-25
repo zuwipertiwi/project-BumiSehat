@@ -8,7 +8,7 @@ export default function Aktivitas() {
   const [aktivitas, setAktivitas] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const [formData, setFormData] = useState({ judul: '', deskripsi: '', dampak: '', kategori: '' })
+  const [formData, setFormData] = useState({ judul: '', deskripsi: '', dampak: '', kategori: '', pohon_ditanam: 0 })
   const router = useRouter()
 
   useEffect(() => {
@@ -44,39 +44,72 @@ export default function Aktivitas() {
 
   const handleAddAktivitas = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    const user = localStorage.getItem('user')
-    if (!user) {
-      alert('User tidak ditemukan')
+
+    // Validasi form
+    if (!formData.judul.trim()) {
+      alert('❌ Judul tidak boleh kosong')
+      return
+    }
+    if (!formData.deskripsi.trim()) {
+      alert('❌ Deskripsi tidak boleh kosong')
+      return
+    }
+    if (!formData.kategori.trim()) {
+      alert('❌ Kategori harus dipilih')
       return
     }
 
-    const userData = JSON.parse(user)
+    const user = localStorage.getItem('user')
+    if (!user) {
+      alert('❌ User tidak ditemukan. Silakan login ulang.')
+      return
+    }
+
+    let userData
+    try {
+      userData = JSON.parse(user)
+    } catch (e) {
+      console.error('Error parsing user data:', e)
+      alert('❌ Data user tidak valid. Silakan login ulang.')
+      return
+    }
+
+    if (!userData.id) {
+      alert('❌ UserId tidak ditemukan. Silakan login ulang.')
+      return
+    }
 
     try {
-      console.log('📝 Creating aktivitas...')
+      console.log('📝 Creating aktivitas...', { ...formData, userId: userData.id })
       const response = await fetch('/api/aktivitas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...formData,
+          judul: formData.judul.trim(),
+          deskripsi: formData.deskripsi.trim(),
+          dampak: formData.dampak.trim(),
+          kategori: formData.kategori.trim(),
+          pohon_ditanam: formData.kategori.trim().toLowerCase() === 'penanaman' ? formData.pohon_ditanam : 0,
           userId: userData.id
         })
       })
 
       const result = await response.json()
+      console.log('📥 API Response:', { status: response.status, result })
 
       if (result.success) {
         console.log('✅ Aktivitas created')
+        alert('✅ Aktivitas berhasil ditambahkan!')
         setAktivitas([result.data, ...aktivitas])
-        setFormData({ judul: '', deskripsi: '', dampak: '', kategori: '' })
+        setFormData({ judul: '', deskripsi: '', dampak: '', kategori: '', pohon_ditanam: 0 })
         setShowForm(false)
       } else {
-        alert('Gagal membuat aktivitas: ' + result.message)
+        console.warn('⚠️ API returned error:', result.message)
+        alert('❌ ' + (result.message || 'Gagal membuat aktivitas'))
       }
-    } catch (error) {
-      console.error('❌ Error creating aktivitas:', error)
-      alert('Terjadi kesalahan saat membuat aktivitas')
+    } catch (error: any) {
+      console.error('❌ Error creating aktivitas:', error.message || error)
+      alert('❌ Terjadi kesalahan koneksi. Silakan coba lagi.')
     }
   }
 
@@ -106,7 +139,7 @@ export default function Aktivitas() {
         </div>
 
         {/* Add Button */}
-        <button 
+        <button
           onClick={() => setShowForm(!showForm)}
           className="mb-8 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition-all"
         >
@@ -166,6 +199,19 @@ export default function Aktivitas() {
                   rows={2}
                 />
               </div>
+              {formData.kategori.toLowerCase() === 'penanaman' && (
+                <div>
+                  <label className="block text-gray-700 font-semibold mb-2">🌳 Jumlah Pohon Ditanam</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formData.pohon_ditanam}
+                    onChange={(e) => setFormData({ ...formData, pohon_ditanam: parseInt(e.target.value) || 0 })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    placeholder="Berapa pohon yang ditanam?"
+                  />
+                </div>
+              )}
               <button
                 type="submit"
                 className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition-all"
@@ -211,7 +257,7 @@ export default function Aktivitas() {
             <div className="text-5xl mb-4">📝</div>
             <p className="text-gray-600 text-lg">Belum ada aktivitas tercatat</p>
             <p className="text-gray-500 mb-6">Mulai catat aktivitas ramah lingkunganmu sekarang!</p>
-            <button 
+            <button
               onClick={() => setShowForm(true)}
               className="bg-emerald-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-emerald-700"
             >

@@ -3,9 +3,11 @@ import mongoose from 'mongoose'
 interface ITips extends mongoose.Document {
   judul: string
   konten: string
-  kategori_id?: mongoose.Schema.Types.ObjectId
+  deskripsi?: string
+  kategori?: string
   penulis: string
   foto?: string
+  views: number
   createdAt: Date
   updatedAt: Date
 }
@@ -20,17 +22,30 @@ const tipsSchema = new mongoose.Schema<ITips>(
       type: String,
       required: true,
     },
-    kategori_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'KategoriTips',
+    deskripsi: {
+      type: String,
+      default: '',
+    },
+    kategori: {
+      type: String,
+      default: 'Umum',
     },
     penulis: {
       type: String,
-      required: true,
+      default: 'Admin BumiSehat',
     },
     foto: String,
+    views: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 )
 
-export default mongoose.models.Tips || mongoose.model('Tips', tipsSchema)
+// Clear model cache to avoid stale model issues in development
+if (mongoose.models.Tips) {
+  delete mongoose.models.Tips
+}
+
+export default mongoose.model('Tips', tipsSchema)
