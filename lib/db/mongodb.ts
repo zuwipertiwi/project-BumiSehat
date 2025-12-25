@@ -1,14 +1,6 @@
 import mongoose from 'mongoose'
 
-const MONGODB_URI = process.env.MONGODB_URI!
-
-if (!MONGODB_URI) {
-  throw new Error(
-    'Invalid/Missing environment variable: "MONGODB_URI". ' +
-    'Please set MONGODB_URI in your environment variables. ' +
-    'For development, use: mongodb://127.0.0.1:27017/bumisehat'
-  )
-}
+const MONGODB_URI = process.env.MONGODB_URI
 
 let cached = global as any
 
@@ -17,6 +9,15 @@ if (!cached.mongo) {
 }
 
 async function connectDB() {
+  // Check MONGODB_URI at runtime, not at module load time
+  if (!MONGODB_URI) {
+    throw new Error(
+      'Invalid/Missing environment variable: "MONGODB_URI". ' +
+      'Please set MONGODB_URI in your environment variables. ' +
+      'For development, use: mongodb://127.0.0.1:27017/bumisehat'
+    )
+  }
+
   if (cached.mongo.conn) {
     console.log('♻️ Using cached MongoDB connection')
     return cached.mongo.conn
