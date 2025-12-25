@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 // Routes yang perlu authentication
 const protectedRoutes = ['/dashboard', '/aktivitas', '/tips', '/profil']
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const token = request.cookies.get('token')?.value
 

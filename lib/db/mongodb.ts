@@ -1,9 +1,13 @@
 import mongoose from 'mongoose'
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/bumisehat'
+const MONGODB_URI = process.env.MONGODB_URI
 
 if (!MONGODB_URI) {
-  throw new Error('Invalid/Missing environment variable: "MONGODB_URI"')
+  throw new Error(
+    'Invalid/Missing environment variable: "MONGODB_URI". ' +
+    'Please set MONGODB_URI in your environment variables. ' +
+    'For development, use: mongodb://127.0.0.1:27017/bumisehat'
+  )
 }
 
 let cached = global as any
@@ -27,7 +31,7 @@ async function connectDB() {
 
     console.log('🔌 Initiating new MongoDB connection...')
     console.log('📍 Connection URI:', MONGODB_URI.replace(/:[^:]*@/, ':****@'))
-    
+
     cached.mongo.promise = mongoose
       .connect(MONGODB_URI, opts)
       .then((mongoose) => {
